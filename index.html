@@ -1,163 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Invoice Generator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    .container { max-width: 900px; margin: auto; }
-    .invoice-box {
-      width: 210mm; min-height: 297mm;
-      background: #fff; padding: 20mm; margin-top: 20px;
-      border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    table, th, td { border: 1px solid #ddd; padding: 8px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .right { text-align: right; }
-    .btn { margin: 10px 0; padding: 10px 15px; background: #0066cc; color: white; border: none; cursor: pointer; border-radius: 5px; }
-    .btn:hover { background: #004c99; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>📑 Generate Invoice</h2>
-    
-    <div>
-      <label for="institutionSelect">Institution:</label>
-      <select id="institutionSelect">
-        <option value="">-- Select Institution --</option>
-      </select>
-    </div>
-    
-    <div style="margin-top:10px;">
-      <label for="eventSelect">Event / Booking:</label>
-      <select id="eventSelect" disabled>
-        <option value="">-- Select Event --</option>
-      </select>
-    </div>
+<div class="container">
+  <h2>📑 Generate Invoice</h2>
 
-    <div id="invoice" class="invoice-box" style="display:none;">
-      <div class="header">
-        <div>
-          <h3>GTEC HOSPITALITY MANAGEMENT SERVICES</h3>
-          <p>P.O. BOX MB 28, MINISTRIES – ACCRA</p>
-          <p>Contact: 0244202959, 0244660848</p>
-          <p>Email: hospitality@gtec.edu.gh</p>
-        </div>
-        <div class="right">
-          <p><b>Invoice No:</b> <span id="invNo"></span></p>
-          <p><b>Date:</b> <span id="invDate"></span></p>
-        </div>
-      </div>
+  <!-- Coordinator Form -->
+  <div id="formSection">
+    <label>Institution:</label>
+    <select id="institutionSelect">
+      <option value="">-- Select Institution --</option>
+    </select><br><br>
 
-      <h2 style="text-align:center;">INVOICE</h2>
+    <label>Event / Booking:</label>
+    <select id="eventSelect" disabled>
+      <option value="">-- Select Event --</option>
+    </select><br><br>
 
-      <table>
-        <tr><th>Sl No.</th><th>Description</th><th>Amount</th></tr>
-        <tr>
-          <td>1</td>
-          <td id="eventDesc">-</td>
-          <td id="amount">-</td>
-        </tr>
-        <tr>
-          <td colspan="2" style="text-align:right;"><b>Total</b></td>
-          <td id="total">-</td>
-        </tr>
-      </table>
+    <label>Invoice ID:</label>
+    <input type="text" id="invoiceId"><br><br>
 
-      <h3>Bank Details</h3>
-      <p><b>A/c Holder’s Name:</b> GTEC CONFERENCE</p>
-      <p><b>Bank Name:</b> AGRICULTURAL DEVELOPMENT BANK</p>
-      <p><b>A/c No.:</b> 0701010009158801</p>
-      <p><b>Branch & Bank Code:</b> Gulf House</p>
+    <label>Delivery No.:</label>
+    <input type="text" id="deliveryNo"><br><br>
 
-      <p style="margin-top:30px;"><i>Kindly Note: 50% payment required to secure venue.</i></p>
-    </div>
+    <label>Dated:</label>
+    <input type="date" id="dated"><br><br>
 
-    <button id="downloadBtn" class="btn" style="display:none;">Download PDF</button>
+    <label>SI No.:</label>
+    <input type="text" id="siNo"><br><br>
+
+    <label>Description (Venue + Services):</label>
+    <select id="descSelect">
+      <option value="">-- Select --</option>
+    </select><br><br>
+
+    <label>Amount:</label>
+    <input type="number" id="amountInput"><br><br>
+
+    <label>Total Cost:</label>
+    <input type="number" id="totalInput"><br><br>
+
+    <button class="btn" onclick="generateInvoice()">Generate Invoice</button>
   </div>
 
-  <script>
-    // ✅ Updated working sheet URL
-    const sheetURL = "https://opensheet.elk.sh/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/All%20Bookings%20Responses";
+  <!-- Invoice Output -->
+  <div id="invoice" class="invoice-box" style="display:none;">
+    <div class="header">
+      <div>
+        <h3>GTEC HOSPITALITY MANAGEMENT SERVICES</h3>
+        <p>P.O. BOX MB 28, MINISTRIES – ACCRA</p>
+        <p>Contact: 0244202959, 0244660848</p>
+        <p>Email: hospitality@gtec.edu.gh</p>
+      </div>
+      <div class="right">
+        <p><b>Invoice No:</b> <span id="invNo"></span></p>
+        <p><b>Date:</b> <span id="invDate"></span></p>
+      </div>
+    </div>
 
-    let bookings = [];
+    <h2 style="text-align:center;">INVOICE</h2>
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const res = await fetch(sheetURL);
-        bookings = await res.json();
-        console.log("Bookings loaded:", bookings); // debug
-        populateInstitutions();
-      } catch (err) {
-        console.error("Error loading booking data:", err);
-        alert("Could not load booking data. Check console.");
-      }
+    <table>
+      <tr><th>SI No.</th><th>Description</th><th>Amount</th></tr>
+      <tr>
+        <td id="siCell">-</td>
+        <td id="eventDesc">-</td>
+        <td id="amount">-</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:right;"><b>Total</b></td>
+        <td id="total">-</td>
+      </tr>
+    </table>
+
+    <h3>Bank Details</h3>
+    <p><b>A/c Holder’s Name:</b> GTEC CONFERENCE</p>
+    <p><b>Bank Name:</b> AGRICULTURAL DEVELOPMENT BANK</p>
+    <p><b>A/c No.:</b> 0701010009158801</p>
+    <p><b>Branch & Bank Code:</b> Gulf House</p>
+
+    <p style="margin-top:30px;"><i>Kindly Note: 50% payment required to secure venue.</i></p>
+  </div>
+
+  <button id="downloadBtn" class="btn" style="display:none;">Download PDF</button>
+</div>
+
+<script>
+  const sheetURL = "https://opensheet.elk.sh/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/All%20Bookings%20Responses";
+  let bookings = [];
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const res = await fetch(sheetURL);
+    bookings = await res.json();
+    populateInstitutions();
+  });
+
+  function populateInstitutions() {
+    const instSet = new Set(bookings.map(b => b["Name of Institution/Organization/Person"]?.trim()).filter(Boolean));
+    const instSelect = document.getElementById("institutionSelect");
+    instSet.forEach(inst => {
+      const opt = document.createElement("option");
+      opt.value = inst;
+      opt.textContent = inst;
+      instSelect.appendChild(opt);
+    });
+    instSelect.onchange = onInstitutionChange;
+  }
+
+  function onInstitutionChange() {
+    const inst = document.getElementById("institutionSelect").value;
+    const eventSelect = document.getElementById("eventSelect");
+    const descSelect = document.getElementById("descSelect");
+    eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
+    descSelect.innerHTML = '<option value="">-- Select --</option>';
+
+    if (!inst) { eventSelect.disabled = true; return; }
+
+    const filtered = bookings.filter(b => b["Name of Institution/Organization/Person"]?.trim() === inst);
+
+    filtered.forEach(b => {
+      const eOpt = document.createElement("option");
+      eOpt.value = b["ID"];
+      eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
+      eventSelect.appendChild(eOpt);
+
+      const dOpt = document.createElement("option");
+      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`;
+      dOpt.textContent = `${b["Venue"]} - ${b["Additional Services"]}`;
+      descSelect.appendChild(dOpt);
     });
 
-    function populateInstitutions() {
-      const instSet = new Set(bookings.map(b => b["Name of Institution/Organization/Person"] && b["Name of Institution/Organization/Person"].trim()).filter(Boolean));
-      const instSelect = document.getElementById("institutionSelect");
-      instSet.forEach(inst => {
-        const opt = document.createElement("option");
-        opt.value = inst;
-        opt.textContent = inst;
-        instSelect.appendChild(opt);
-      });
-    }
+    eventSelect.disabled = false;
+  }
 
-    document.getElementById("institutionSelect").addEventListener("change", onInstitutionChange);
-    document.getElementById("eventSelect").addEventListener("change", onEventChange);
+  function generateInvoice() {
+    // Collect manual inputs
+    document.getElementById("invNo").textContent = document.getElementById("invoiceId").value;
+    document.getElementById("invDate").textContent = document.getElementById("dated").value || new Date().toLocaleDateString();
+    document.getElementById("siCell").textContent = document.getElementById("siNo").value;
+    document.getElementById("eventDesc").textContent = document.getElementById("descSelect").value;
+    document.getElementById("amount").textContent = document.getElementById("amountInput").value;
+    document.getElementById("total").textContent = document.getElementById("totalInput").value;
 
-    function onInstitutionChange() {
-      const inst = document.getElementById("institutionSelect").value;
-      const eventSelect = document.getElementById("eventSelect");
-      eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
+    document.getElementById("invoice").style.display = "block";
+    document.getElementById("downloadBtn").style.display = "inline-block";
+  }
 
-      if (!inst) {
-        eventSelect.disabled = true;
-        return;
-      }
-      const filtered = bookings.filter(b => String(b["Name of Institution/Organization/Person"]).trim() === inst);
-      filtered.forEach(b => {
-        const opt = document.createElement("option");
-        opt.value = b["ID"];
-        opt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
-        eventSelect.appendChild(opt);
-      });
-      eventSelect.disabled = false;
-    }
-
-    function onEventChange() {
-      const sel = document.getElementById("eventSelect").value;
-      if (!sel) return;
-
-      const booking = bookings.find(b => String(b["ID"]).trim() === sel.trim());
-      if (!booking) {
-        alert("Event/Booking not found!");
-        return;
-      }
-
-      // fill invoice data
-      document.getElementById("invNo").textContent = "INV-" + booking["ID"];
-      document.getElementById("invDate").textContent = new Date().toLocaleDateString();
-      document.getElementById("eventDesc").textContent = booking["Event Description"] || "-";
-
-      // ⚠️ Adjust column if you have a real Amount field
-      const amountVal = booking["Amount"] || booking["Number of Participants"] || "0";
-      document.getElementById("amount").textContent = amountVal;
-      document.getElementById("total").textContent = amountVal;
-
-      document.getElementById("invoice").style.display = "block";
-      document.getElementById("downloadBtn").style.display = "inline-block";
-    }
-
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const invoiceElem = document.getElementById("invoice");
-      html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
-    });
-  </script>
-</body>
-</html>
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    const invoiceElem = document.getElementById("invoice");
+    html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
+  });
+</script>
