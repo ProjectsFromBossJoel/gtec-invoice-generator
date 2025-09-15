@@ -151,25 +151,89 @@
     <button onclick="generateInvoice()">Generate Invoice</button>
   </div>
 
-  <!-- RIGHT: PREVIEW -->
-  <div class="preview-section">
-    <h2>Invoice Preview</h2>
-    <div id="invoice" class="invoice">
-      <img src="loginpage.png" class="logo" alt="Watermark Logo">
-      <div class="invoice-content">
-        <div class="invoice-header">
-          <h3>Invoice</h3>
-        </div>
-        <div class="invoice-details">
-          <p><span>Invoice No:</span> <span id="invNo"></span></p>
-          <p><span>Date:</span> <span id="invDate"></span></p>
-          <p><span>SI No:</span> <span id="siCell"></span></p>
-          <p><span>Event:</span> <span id="eventDesc"></span></p>
-          <p><span>Amount:</span> <span id="amount"></span></p>
-          <p><span>Total:</span> <span id="total"></span></p>
-        </div>
-      </div>
+  <div id="invoice" class="invoice">
+  <div class="invoice-content">
+    <!-- HEADER -->
+    <table style="width:100%; border-collapse: collapse;">
+      <tr>
+        <td style="width:70%; vertical-align: top;">
+          <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
+          <p>P.O.BOX MB 28</p>
+          <p>MINISTRIES – ACCRA</p>
+          <p>Contact: 0244202959, 0244660848</p>
+          <p>Email: hospitality@gtec.edu.gh</p>
+          <p><b>COORDINATOR :</b> _____________________</p>
+        </td>
+        <td style="width:30%; border:1px solid #000; padding:5px;">
+          <p><b>Invoice No.:</b> <span id="invNo"></span></p>
+          <p><b>Dated:</b> <span id="invDate"></span></p>
+          <p><b>Delivery No.:</b> <span id="deliveryNoCell"></span></p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- LOGO CENTER -->
+    <div style="text-align:center; margin:10px 0;">
+      <img src="loginpage.png" alt="Logo" style="height:70px;">
     </div>
+
+    <!-- INVOICE TITLE -->
+    <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
+
+    <!-- INVOICE TABLE -->
+    <table style="width:100%; border-collapse: collapse;" border="1">
+      <tr>
+        <th style="width:10%;">SI No.</th>
+        <th style="width:70%;">DESCRIPTION</th>
+        <th style="width:20%;">AMOUNT</th>
+      </tr>
+      <tr>
+        <td id="siCell"></td>
+        <td style="position:relative;">
+          <span id="eventDesc"></span>
+          <!-- Watermark -->
+          <img src="loginpage.png" style="opacity:0.1; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); height:100px;">
+        </td>
+        <td id="amount"></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
+        <td id="total"></td>
+      </tr>
+    </table>
+
+    <!-- FOOTER -->
+    <table style="width:100%; margin-top:20px; border-collapse: collapse;">
+      <tr>
+        <!-- Kindly Note -->
+        <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
+          <p><i><b>KINDLY NOTE:</b></i></p>
+          <ol style="margin:0; padding-left:15px;">
+            <li>A refundable Deposit of 10% of the total cost is required to be paid by cash</li>
+            <li>50% payment is required to secure the venue</li>
+            <li>Full payment should be made before the actual date of the programme</li>
+          </ol>
+        </td>
+        <!-- Bank Details -->
+        <td style="width:45%; border:1px solid #000; padding:0;">
+          <table style="width:100%; border-collapse: collapse;" border="1">
+            <tr><td><b>A/c Holder’s Name</b></td><td>GTEC CONFERENCE</td></tr>
+            <tr><td><b>Bank Name</b></td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
+            <tr><td><b>A/c No.</b></td><td>0701010009158801</td></tr>
+            <tr><td><b>Branch & Bank Code</b></td><td>Gulf House</td></tr>
+            <tr><td><b>SWIFT CODE</b></td><td>________________</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- SIGNATURE -->
+    <div style="text-align:right; margin-top:40px;">
+      ......................................................
+    </div>
+  </div>
+</div>
+
     <button id="downloadBtn">Download PDF</button>
   </div>
 </div>
@@ -253,3 +317,4 @@
 
 </body>
 </html>
+
