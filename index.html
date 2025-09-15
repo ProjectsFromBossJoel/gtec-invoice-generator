@@ -82,68 +82,76 @@
 </div>
 
 <script>
-  const sheetURL = "https://opensheet.elk.sh/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/All%20Bookings%20Responses";
-  let bookings = [];
+const sheetURL = "https://opensheet.elk.sh/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/All%20Bookings%20Responses";
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const res = await fetch(sheetURL);
-    bookings = await res.json();
-    populateInstitutions();
-  });
+async function loadInstitutions() {
+    try {
+        const response = await fetch(sheetURL);
+        const data = await response.json();
 
-  function populateInstitutions() {
-    const instSet = new Set(bookings.map(b => b["Name of Institution/Organization/Person"]?.trim()).filter(Boolean));
-    const instSelect = document.getElementById("institutionSelect");
-    instSet.forEach(inst => {
-      const opt = document.createElement("option");
-      opt.value = inst;
-      opt.textContent = inst;
-      instSelect.appendChild(opt);
-    });
-    instSelect.onchange = onInstitutionChange;
-  }
+        // Get dropdowns
+        const institutionSelect = document.getElementById("institution");
+        const eventSelect = document.getElementById("event");
+        const descriptionSelect = document.getElementById("description");
 
-  function onInstitutionChange() {
-    const inst = document.getElementById("institutionSelect").value;
-    const eventSelect = document.getElementById("eventSelect");
-    const descSelect = document.getElementById("descSelect");
-    eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-    descSelect.innerHTML = '<option value="">-- Select --</option>';
+        // Clear any old options
+        institutionSelect.innerHTML = '<option value="">-- Select Institution --</option>';
+        eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
+        descriptionSelect.innerHTML = '<option value="">-- Select --</option>';
 
-    if (!inst) { eventSelect.disabled = true; return; }
+        // Populate institution dropdown
+        let institutions = [...new Set(data.map(row => row["Name of Institution/Organization/Person"]))];
+        institutions.forEach(inst => {
+            let option = document.createElement("option");
+            option.value = inst;
+            option.textContent = inst;
+            institutionSelect.appendChild(option);
+        });
 
-    const filtered = bookings.filter(b => b["Name of Institution/Organization/Person"]?.trim() === inst);
+        // Listen for Institution selection → load events
+        institutionSelect.addEventListener("change", function() {
+            let selectedInst = this.value;
+            eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
 
-    filtered.forEach(b => {
-      const eOpt = document.createElement("option");
-      eOpt.value = b["ID"];
-      eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
-      eventSelect.appendChild(eOpt);
+            let filtered = data.filter(row => row["Name of Institution/Organization/Person"] === selectedInst);
 
-      const dOpt = document.createElement("option");
-      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`;
-      dOpt.textContent = `${b["Venue"]} - ${b["Additional Services"]}`;
-      descSelect.appendChild(dOpt);
-    });
+            filtered.forEach(row => {
+                let option = document.createElement("option");
+                option.value = row["Event Description"];
+                option.textContent = row["Event Description"];
+                eventSelect.appendChild(option);
+            });
+        });
 
-    eventSelect.disabled = false;
-  }
+        // Listen for Event selection → load venue + services
+        eventSelect.addEventListener("change", function() {
+            let selectedEvent = this.value;
+            descriptionSelect.innerHTML = '<option value="">-- Select --</option>';
 
-  function generateInvoice() {
-    // Collect manual inputs
-    document.getElementById("invNo").textContent = document.getElementById("invoiceId").value;
-    document.getElementById("invDate").textContent = document.getElementById("dated").value || new Date().toLocaleDateString();
-    document.getElementById("siCell").textContent = document.getElementById("siNo").value;
-    document.getElementById("eventDesc").textContent = document.getElementById("descSelect").value;
-    document.getElementById("amount").textContent = document.getElementById("amountInput").value;
-    document.getElementById("total").textContent = document.getElementById("totalInput").value;
+            let row = data.find(r => r["Event Description"] === selectedEvent);
 
-    document.getElementById("invoice").style.display = "block";
-    document.getElementById("downloadBtn").style.display = "inline-block";
-  }
+            if (row) {
+                let option1 = document.createElement("option");
+                option1.value = row["Venue"];
+                option1.textContent = "Venue: " + row["Venue"];
+                descriptionSelect.appendChild(option1);
 
-  document.getElementById("downloadBtn").addEventListener("click", () => {
-    const invoiceElem = document.getElementById("invoice");
-    html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
-  });
+                if (row["Additional Services"]) {
+                    let option2 = document.createElement("option");
+                    option2.value = row["Additional Services"];
+                    option2.textContent = "Services: " + row["Additional Services"];
+                    descriptionSelect.appendChild(option2);
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error loading sheet data:", error);
+    }
+}
+
+// Load data on page ready
+window.onload = loadInstitutions;
 </script>
+
+
