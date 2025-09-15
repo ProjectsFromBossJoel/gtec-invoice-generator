@@ -1,67 +1,208 @@
-<!-- Dropdowns -->
-<select id="institutionSelect">
-  <option value="">-- Select Institution --</option>
-</select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+    }
 
-<select id="eventSelect" disabled>
-  <option value="">-- Select Event --</option>
-</select>
+    .container {
+      display: flex;
+      height: 100vh;
+    }
 
-<select id="descSelect" disabled>
-  <option value="">-- Select --</option>
-</select>
+    .form-section, .preview-section {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
 
-<!-- Invoice Section -->
-<div id="invoice" style="display:none;">
-  <p>Invoice No: <span id="invNo"></span></p>
-  <p>Date: <span id="invDate"></span></p>
-  <p>SI No: <span id="siCell"></span></p>
-  <p>Event: <span id="eventDesc"></span></p>
-  <p>Amount: <span id="amount"></span></p>
-  <p>Total: <span id="total"></span></p>
+    .form-section {
+      background: #fff;
+      border-right: 2px solid #ddd;
+    }
+
+    .form-section h2, .preview-section h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .invoice {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .logo {
+      width: 100px;
+      opacity: 0.1;
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+
+    .invoice-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .invoice-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .invoice-details {
+      margin-bottom: 15px;
+    }
+
+    .invoice-details span {
+      display: inline-block;
+      min-width: 120px;
+      font-weight: bold;
+    }
+
+    #downloadBtn {
+      display: none;
+      margin-top: 10px;
+      background: #28a745;
+    }
+    #downloadBtn:hover {
+      background: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- LEFT: FORM -->
+  <div class="form-section">
+    <h2>Invoice Form</h2>
+    <label for="institutionSelect">Institution</label>
+    <select id="institutionSelect">
+      <option value="">-- Select Institution --</option>
+    </select>
+
+    <label for="eventSelect">Event</label>
+    <select id="eventSelect" disabled>
+      <option value="">-- Select Event --</option>
+    </select>
+
+    <label for="descSelect">Venue & Services</label>
+    <select id="descSelect" disabled>
+      <option value="">-- Select --</option>
+    </select>
+
+    <label for="invoiceId">Invoice No.</label>
+    <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
+
+    <label for="dated">Date</label>
+    <input type="date" id="dated">
+
+    <label for="siNo">SI No.</label>
+    <input type="text" id="siNo" placeholder="Enter SI No.">
+
+    <label for="amountInput">Amount</label>
+    <input type="number" id="amountInput" placeholder="Enter Amount">
+
+    <label for="totalInput">Total</label>
+    <input type="number" id="totalInput" placeholder="Enter Total">
+
+    <button onclick="generateInvoice()">Generate Invoice</button>
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div class="preview-section">
+    <h2>Invoice Preview</h2>
+    <div id="invoice" class="invoice">
+      <img src="loginpage.png" class="logo" alt="Watermark Logo">
+      <div class="invoice-content">
+        <div class="invoice-header">
+          <h3>Invoice</h3>
+        </div>
+        <div class="invoice-details">
+          <p><span>Invoice No:</span> <span id="invNo"></span></p>
+          <p><span>Date:</span> <span id="invDate"></span></p>
+          <p><span>SI No:</span> <span id="siCell"></span></p>
+          <p><span>Event:</span> <span id="eventDesc"></span></p>
+          <p><span>Amount:</span> <span id="amount"></span></p>
+          <p><span>Total:</span> <span id="total"></span></p>
+        </div>
+      </div>
+    </div>
+    <button id="downloadBtn">Download PDF</button>
+  </div>
 </div>
 
-<!-- Download Button -->
-<button id="downloadBtn" style="display:none;">Download Invoice</button>
-
-<!-- ✅ JavaScript -->
 <script>
   const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
   let bookings = [];
 
   document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const res = await fetch(sheetCSV);
-      const csvText = await res.text();
+    const res = await fetch(sheetCSV);
+    const csvText = await res.text();
 
-      // Parse CSV → JSON
-      const rows = csvText.trim().split("\n").map(r => r.split(","));
-      const headers = rows[0];
-      bookings = rows.slice(1).map(r => {
-        let obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
-        return obj;
-      });
+    // Parse CSV → JSON
+    const rows = csvText.trim().split("\n").map(r => r.split(","));
+    const headers = rows[0];
+    bookings = rows.slice(1).map(r => {
+      let obj = {};
+      headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
+      return obj;
+    });
 
-      populateInstitutions();
-    } catch (err) {
-      console.error("Error fetching or parsing CSV:", err);
-    }
+    populateInstitutions();
   });
 
   function populateInstitutions() {
-    const instSet = new Set(
-      bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean)
-    );
+    const instSet = new Set(bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean));
     const instSelect = document.getElementById("institutionSelect");
-
     instSet.forEach(inst => {
       const opt = document.createElement("option");
       opt.value = inst;
       opt.textContent = inst;
       instSelect.appendChild(opt);
     });
-
     instSelect.onchange = onInstitutionChange;
   }
 
@@ -69,27 +210,21 @@
     const inst = document.getElementById("institutionSelect").value;
     const eventSelect = document.getElementById("eventSelect");
     const descSelect = document.getElementById("descSelect");
-
-    // Reset dropdowns
     eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
     descSelect.innerHTML = '<option value="">-- Select --</option>';
 
-    if (!inst) { 
-      eventSelect.disabled = true; 
-      descSelect.disabled = true; 
-      return; 
-    }
+    if (!inst) { eventSelect.disabled = true; descSelect.disabled = true; return; }
 
     const filtered = bookings.filter(b => b["Name of Institution/Organization/Person"] === inst);
 
     filtered.forEach(b => {
       const eOpt = document.createElement("option");
       eOpt.value = b["ID"];
-      eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`; // ✅ fixed
+      eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
       eventSelect.appendChild(eOpt);
 
       const dOpt = document.createElement("option");
-      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`; // ✅ fixed
+      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`;
       dOpt.textContent = `${b["Venue"]} - ${b["Additional Services"]}`;
       descSelect.appendChild(dOpt);
     });
@@ -115,3 +250,6 @@
     html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
   });
 </script>
+
+</body>
+</html>
