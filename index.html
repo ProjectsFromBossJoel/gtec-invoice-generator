@@ -5,17 +5,18 @@
   <title>Invoice Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .container { max-width: 800px; margin: auto; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    .container { max-width: 900px; margin: auto; }
     .invoice-box {
-      border: 1px solid #eee; padding: 20px; margin-top: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 210mm; min-height: 297mm;
+      background: #fff; padding: 20mm; margin-top: 20px;
+      border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     table, th, td { border: 1px solid #ddd; padding: 8px; }
-    .header { display: flex; justify-content: space-between; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; }
     .right { text-align: right; }
-    .btn { margin: 10px 0; padding: 10px 15px; background: #0066cc; color: white; border: none; cursor: pointer; }
+    .btn { margin: 10px 0; padding: 10px 15px; background: #0066cc; color: white; border: none; cursor: pointer; border-radius: 5px; }
     .btn:hover { background: #004c99; }
   </style>
 </head>
@@ -79,6 +80,7 @@
   </div>
 
   <script>
+    // ✅ Updated working sheet URL
     const sheetURL = "https://opensheet.elk.sh/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/All%20Bookings%20Responses";
 
     let bookings = [];
@@ -104,9 +106,10 @@
         opt.textContent = inst;
         instSelect.appendChild(opt);
       });
-
-      instSelect.addEventListener("change", onInstitutionChange);
     }
+
+    document.getElementById("institutionSelect").addEventListener("change", onInstitutionChange);
+    document.getElementById("eventSelect").addEventListener("change", onEventChange);
 
     function onInstitutionChange() {
       const inst = document.getElementById("institutionSelect").value;
@@ -120,21 +123,17 @@
       const filtered = bookings.filter(b => String(b["Name of Institution/Organization/Person"]).trim() === inst);
       filtered.forEach(b => {
         const opt = document.createElement("option");
-        // Show Event Description + Date
         opt.value = b["ID"];
         opt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
         eventSelect.appendChild(opt);
       });
       eventSelect.disabled = false;
-
-      eventSelect.addEventListener("change", onEventChange);
     }
 
     function onEventChange() {
       const sel = document.getElementById("eventSelect").value;
-      if (!sel) {
-        return;
-      }
+      if (!sel) return;
+
       const booking = bookings.find(b => String(b["ID"]).trim() === sel.trim());
       if (!booking) {
         alert("Event/Booking not found!");
@@ -142,10 +141,12 @@
       }
 
       // fill invoice data
-      document.getElementById("invNo").textContent = booking["ID"];
+      document.getElementById("invNo").textContent = "INV-" + booking["ID"];
       document.getElementById("invDate").textContent = new Date().toLocaleDateString();
       document.getElementById("eventDesc").textContent = booking["Event Description"] || "-";
-      const amountVal = booking["Number of Participants"] || "0";
+
+      // ⚠️ Adjust column if you have a real Amount field
+      const amountVal = booking["Amount"] || booking["Number of Participants"] || "0";
       document.getElementById("amount").textContent = amountVal;
       document.getElementById("total").textContent = amountVal;
 
@@ -160,4 +161,3 @@
   </script>
 </body>
 </html>
-
