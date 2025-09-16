@@ -299,54 +299,93 @@ function populateInstitutions() {
 
 }
 
-function onInstitutionChange() {
+ function onInstitutionChange() {
   const inst = document.getElementById("institutionSelect").value;
   const eventSelect = document.getElementById("eventSelect");
   const descSelect = document.getElementById("descSelect");
-  const refreshSelect = document.getElementById("refreshSelect");
+  const serviceSelect = document.getElementById("serviceSelect");
 
   eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-  descSelect.innerHTML = '<option value="">-- Select Services --</option>';
-  refreshSelect.innerHTML = '<option value="">-- Select Refreshment --</option>';
+  descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
+  serviceSelect.innerHTML = ''; // clear previous services
 
   if (!inst) {
     eventSelect.disabled = true;
     descSelect.disabled = true;
-    refreshSelect.disabled = true;
+    serviceSelect.disabled = true;
     return;
   }
 
   const filtered = bookings.filter(
-    b => b[findHeader(headers, "Name of Institution/Organization/Person")] === inst
+    b => b["name of institution/organization/person"] === inst
   );
 
-  const additionalKey = findHeader(headers, "Additional Services");
-  const refreshKey = findHeader(headers, "For Refreshment (Optional)");
-
   filtered.forEach(b => {
-    // Event options
+    // Event
     const eOpt = document.createElement("option");
-    eOpt.value = b["ID"];
-    eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
+    eOpt.value = b["id"];
+    eOpt.textContent = ${b["event description"]} (${b["event start date"]});
     eventSelect.appendChild(eOpt);
 
-    // Additional Services
+    // Venue
     const dOpt = document.createElement("option");
-    dOpt.value = b[additionalKey];
-    dOpt.textContent = b[additionalKey];
+    dOpt.value = b["venue"];
+    dOpt.textContent = b["venue"];
     descSelect.appendChild(dOpt);
 
-    // Refreshment Options
-    const rOpt = document.createElement("option");
-    rOpt.value = b[refreshKey];
-    rOpt.textContent = b[refreshKey] || "(none)";
-    refreshSelect.appendChild(rOpt);
+    // Additional services (split by comma if multiple)
+   const services = b["additional services"] ? b["additional services"].split(",") : [];
+    services.forEach(s => {
+      const sOpt = document.createElement("option");
+      sOpt.value = s.trim();
+      sOpt.textContent = s.trim();
+      serviceSelect.appendChild(sOpt);
+    });
   });
 
+  serviceSelect.disabled = false;
   eventSelect.disabled = false;
   descSelect.disabled = false;
-  refreshSelect.disabled = false;
 }
+
+  function generateInvoice() {
+    const selectedServices = Array.from(
+      document.getElementById("serviceSelect").selectedOptions
+    )
+      .map(opt => opt.value)
+      .join(", ");
+
+    document.getElementById("invNo").textContent =
+      document.getElementById("invoiceId").value;
+    document.getElementById("invDate").textContent =
+      document.getElementById("dated").value || new Date().toLocaleDateString();
+    document.getElementById("siCell").textContent =
+      document.getElementById("siNo").value;
+
+    const venue = document.getElementById("descSelect").value;
+    document.getElementById("eventDesc").textContent = selectedServices
+      ? ${venue} | Services: ${selectedServices}
+      : venue;
+
+    document.getElementById("amount").textContent =
+      document.getElementById("amountInput").value;
+    document.getElementById("total").textContent =
+      document.getElementById("totalInput").value;
+
+    document.getElementById("invoice").style.display = "block";
+    document.getElementById("downloadBtn").style.display = "inline-block";
+  }
+
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    const invoiceElem = document.getElementById("invoice");
+    html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
+  });
+</script>
+
+
+
+</body>
+</html>
 
 </script>
 
@@ -356,6 +395,7 @@ function onInstitutionChange() {
 
 </body>
 </html>
+
 
 
 
