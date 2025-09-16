@@ -339,18 +339,14 @@
     descSelect.appendChild(dOpt);
 
     // Additional services (split by comma if multiple)
-    const servicesSet = new Set(
-  filtered.map(b => b["additional services"]).filter(Boolean)
-);
-
-const serviceSelect = document.getElementById("serviceSelect");
-serviceSelect.innerHTML = "";
-servicesSet.forEach(service => {
-  const opt = document.createElement("option");
-  opt.value = service;
-  opt.textContent = service;
-  serviceSelect.appendChild(opt);
-});
+   const services = b["additional services"] ? b["additional services"].split(",") : [];
+    services.forEach(s => {
+      const sOpt = document.createElement("option");
+      sOpt.value = s.trim();
+      sOpt.textContent = s.trim();
+      serviceSelect.appendChild(sOpt);
+    });
+  });
 
   serviceSelect.disabled = false;
   eventSelect.disabled = false;
@@ -395,6 +391,7 @@ servicesSet.forEach(service => {
 
 </body>
 </html>
+
 
 
 
