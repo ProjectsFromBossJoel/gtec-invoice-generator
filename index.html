@@ -312,86 +312,22 @@
     instSelect.onchange = onInstitutionChange;
   }
 
-  function onInstitutionChange() {
+ function onInstitutionChange() {
   const inst = document.getElementById("institutionSelect").value;
   const eventSelect = document.getElementById("eventSelect");
   const descSelect = document.getElementById("descSelect");
   const serviceSelect = document.getElementById("serviceSelect");
-  const refreshSelect = document.getElementById("refreshSelect");
-  const allDataSelect = document.getElementById("allDataSelect");
 
-  // Clear all dropdowns
   eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
   descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
-  serviceSelect.innerHTML = '';
-  refreshSelect.innerHTML = '';
-  allDataSelect.innerHTML = '<option value="">-- All Data --</option>';
+  serviceSelect.innerHTML = ''; // clear previous services
 
   if (!inst) {
     eventSelect.disabled = true;
     descSelect.disabled = true;
     serviceSelect.disabled = true;
-    refreshSelect.disabled = true;
-    allDataSelect.disabled = true;
     return;
   }
-
-  const filtered = bookings.filter(
-    b => b["name of institution/organization/person"] === inst
-  );
-
-  filtered.forEach(b => {
-    // Event
-    const eOpt = document.createElement("option");
-    eOpt.value = b["id"];
-    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
-    eventSelect.appendChild(eOpt);
-
-    // Venue
-    const dOpt = document.createElement("option");
-    dOpt.value = b["venue"];
-    dOpt.textContent = b["venue"];
-    descSelect.appendChild(dOpt);
-
-    // Additional Services
-    const services = b["additional services"]
-      ? b["additional services"].split(",")
-      : [];
-    services.forEach(s => {
-      const sOpt = document.createElement("option");
-      sOpt.value = s.trim();
-      sOpt.textContent = s.trim();
-      serviceSelect.appendChild(sOpt);
-    });
-
-    // For Refreshment (Optional)
-    const refreshValues = b["for refreshment (optional)"]
-      ? b["for refreshment (optional)"].split(",")
-      : [];
-    refreshValues.forEach(r => {
-      const rOpt = document.createElement("option");
-      rOpt.value = r.trim();
-      rOpt.textContent = r.trim();
-      refreshSelect.appendChild(rOpt);
-    });
-
-    // 🔎 Populate All Data Dropdown (key-value pairs)
-    Object.keys(b).forEach(key => {
-      const val = b[key] || "(empty)";
-      const allOpt = document.createElement("option");
-      allOpt.value = `${key}: ${val}`;
-      allOpt.textContent = `${key}: ${val}`;
-      allDataSelect.appendChild(allOpt);
-    });
-  });
-
-  // Enable all dropdowns
-  eventSelect.disabled = false;
-  descSelect.disabled = false;
-  serviceSelect.disabled = false;
-  refreshSelect.disabled = false;
-  allDataSelect.disabled = false;
-}
 
 
   function generateInvoice() {
@@ -432,4 +368,5 @@
 
 </body>
 </html>
+
 
