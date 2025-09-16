@@ -329,6 +329,38 @@
     return;
   }
 
+  const filtered = bookings.filter(
+    b => b["name of institution/organization/person"] === inst
+  );
+
+  filtered.forEach(b => {
+    // Event
+    const eOpt = document.createElement("option");
+    eOpt.value = b["id"];
+    eOpt.textContent = ${b["event description"]} (${b["event start date"]});
+    eventSelect.appendChild(eOpt);
+
+    // Venue
+    const dOpt = document.createElement("option");
+    dOpt.value = b["venue"];
+    dOpt.textContent = b["venue"];
+    descSelect.appendChild(dOpt);
+
+    // Additional services (split by comma if multiple)
+   const services = b["additional services"] ? b["additional services"].split(",") : [];
+    services.forEach(s => {
+      const sOpt = document.createElement("option");
+      sOpt.value = s.trim();
+      sOpt.textContent = s.trim();
+      serviceSelect.appendChild(sOpt);
+    });
+  });
+
+  serviceSelect.disabled = false;
+  eventSelect.disabled = false;
+  descSelect.disabled = false;
+}
+
 
   function generateInvoice() {
     const selectedServices = Array.from(
@@ -368,5 +400,6 @@
 
 </body>
 </html>
+
 
 
