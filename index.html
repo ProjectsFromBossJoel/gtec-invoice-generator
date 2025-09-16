@@ -128,10 +128,15 @@
       <option value="">-- Select Event --</option>
     </select>
 
-    <label for="descSelect">Venue & Services</label>
+    <label for="descSelect">Venue</label>
     <select id="descSelect" disabled>
-      <option value="">-- Select --</option>
+      <option value="">-- Select Venue--</option>
     </select>
+
+    <label for="serviceSelect">Additional Services</label>
+<select id="serviceSelect" multiple disabled>
+  <option value="">-- Select Services --</option>
+</select>
 
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
@@ -142,8 +147,11 @@
     <label for="siNo">SI No.</label>
     <input type="text" id="siNo" placeholder="Enter SI No.">
 
-    <label for="amountInput">Amount</label>
+    <label for="amountInput">Venue Cost</label>
     <input type="number" id="amountInput" placeholder="Enter Amount">
+
+    <label for="additionalInput">Additional Services Cost</label>
+<input type="number" id="additionalInput" placeholder="Enter Additional Services Cost (sum)">
 
     <label for="totalInput">Total</label>
     <input type="number" id="totalInput" placeholder="Enter Total">
@@ -321,3 +329,4 @@
 
 </body>
 </html>
+
