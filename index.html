@@ -259,20 +259,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const res = await fetch(sheetCSV);
   const csvText = await res.text();
 
-  // --- Parse CSV properly ---
+  // Parse CSV → JSON
   const rows = csvText.trim().split("\n").map(r => r.split(","));
-  const rawHeaders = rows[0];
-
-  // 🔑 Normalize headers: trim spaces and lowercase
-  const headers = rawHeaders.map(h =>
-    h.trim().toLowerCase().replace(/\s+/g, " ")
-  );
+  const headers = rows[0]; // use headers as-is (spaces included!)
 
   bookings = rows.slice(1).map(r => {
     let obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = r[i] ? r[i].trim() : "";
-    });
+    headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
     return obj;
   });
 
@@ -284,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function populateInstitutions() {
   const instSet = new Set(
-    bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
+    bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean)
   );
   const instSelect = document.getElementById("institutionSelect");
   instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
@@ -312,18 +305,18 @@ function onInstitutionChange() {
   }
 
   const filtered = bookings.filter(
-    b => b["name of institution/organization/person"] === inst
+    b => b["Name of Institution/Organization/Person"] === inst
   );
 
   filtered.forEach(b => {
     // Populate Events
     const eOpt = document.createElement("option");
-    eOpt.value = b["event description"];
-    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
+    eOpt.value = b["Event Description"];
+    eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
     eventSelect.appendChild(eOpt);
 
-    // ✅ Use the trimmed & normalized key for additional services
-    const service = b["additional services"];
+    // ✅ Use EXACT header with trailing space for Additional Services
+    const service = b["Additional Services "]; // notice the space at the end!
     if (service) {
       const sOpt = document.createElement("option");
       sOpt.value = service;
@@ -340,8 +333,10 @@ function onInstitutionChange() {
 
 
 
+
 </body>
 </html>
+
 
 
 
