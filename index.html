@@ -138,6 +138,13 @@
   <option value="">-- Select Services --</option>
 </select>
 
+<label for="refreshSelect">For Refreshment (Optional)</label>
+<select id="refreshSelect">
+  <option value="">-- Select Refreshment --</option>
+</select>
+
+    
+
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
 
@@ -290,44 +297,59 @@ function populateInstitutions() {
   instSelect.onchange = onInstitutionChange;
 }
 
+function findHeader(headers, keyword) {
+  return headers.find(h => h.trim().toLowerCase() === keyword.toLowerCase());
+}
+
 function onInstitutionChange() {
   const inst = document.getElementById("institutionSelect").value;
   const eventSelect = document.getElementById("eventSelect");
-  const serviceSelect = document.getElementById("serviceSelect");
+  const descSelect = document.getElementById("descSelect");
+  const refreshSelect = document.getElementById("refreshSelect");
 
   eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-  serviceSelect.innerHTML = '<option value="">-- Select Services --</option>';
+  descSelect.innerHTML = '<option value="">-- Select Services --</option>';
+  refreshSelect.innerHTML = '<option value="">-- Select Refreshment --</option>';
 
   if (!inst) {
     eventSelect.disabled = true;
-    serviceSelect.disabled = true;
+    descSelect.disabled = true;
+    refreshSelect.disabled = true;
     return;
   }
 
   const filtered = bookings.filter(
-    b => b["Name of Institution/Organization/Person"] === inst
+    b => b[findHeader(headers, "Name of Institution/Organization/Person")] === inst
   );
 
+  const additionalKey = findHeader(headers, "Additional Services");
+  const refreshKey = findHeader(headers, "For Refreshment (Optional)");
+
   filtered.forEach(b => {
-    // Populate Events
+    // Event options
     const eOpt = document.createElement("option");
-    eOpt.value = b["Event Description"];
+    eOpt.value = b["ID"];
     eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
     eventSelect.appendChild(eOpt);
 
-    // ✅ Use EXACT header with trailing space for Additional Services
-    const service = b["Additional Services "]; // notice the space at the end!
-    if (service) {
-      const sOpt = document.createElement("option");
-      sOpt.value = service;
-      sOpt.textContent = service;
-      serviceSelect.appendChild(sOpt);
-    }
+    // Additional Services
+    const dOpt = document.createElement("option");
+    dOpt.value = b[additionalKey];
+    dOpt.textContent = b[additionalKey];
+    descSelect.appendChild(dOpt);
+
+    // Refreshment Options
+    const rOpt = document.createElement("option");
+    rOpt.value = b[refreshKey];
+    rOpt.textContent = b[refreshKey] || "(none)";
+    refreshSelect.appendChild(rOpt);
   });
 
   eventSelect.disabled = false;
-  serviceSelect.disabled = false;
+  descSelect.disabled = false;
+  refreshSelect.disabled = false;
 }
+
 </script>
 
 
@@ -336,6 +358,7 @@ function onInstitutionChange() {
 
 </body>
 </html>
+
 
 
 
