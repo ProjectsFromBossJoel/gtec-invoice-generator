@@ -5,133 +5,41 @@
   <title>Invoice Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f7fa;
-    }
-
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .form-section, .preview-section {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .form-section {
-      background: #fff;
-      border-right: 2px solid #ddd;
-    }
-
-    .form-section h2, .preview-section h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #444;
-    }
-
-    select, input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: #fff;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    .invoice {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-      display: none;
-    }
-
-    .logo {
-      width: 100px;
-      opacity: 0.1;
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-    }
-
-    .invoice-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .invoice-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .invoice-details {
-      margin-bottom: 15px;
-    }
-
-    .invoice-details span {
-      display: inline-block;
-      min-width: 120px;
-      font-weight: bold;
-    }
-
-    #downloadBtn {
-      display: none;
-      margin-top: 10px;
-      background: #28a745;
-    }
-    #downloadBtn:hover {
-      background: #1e7e34;
-    }
+    body { font-family: Arial, sans-serif; background: #f5f7fa; margin: 0; }
+    .container { display: flex; height: 100vh; }
+    .form-section, .preview-section { flex: 1; padding: 20px; overflow-y: auto; }
+    .form-section { background: #fff; border-right: 2px solid #ddd; }
+    h2 { text-align: center; margin-bottom: 15px; color: #333; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    select, input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; }
+    button { margin-top: 15px; padding: 10px 20px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-weight: bold; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .invoice { background: #fff; border: 1px solid #ccc; padding: 20px; border-radius: 8px; display: none; }
+    .invoice-header { text-align: center; margin-bottom: 20px; }
+    #downloadBtn { display: none; margin-top: 10px; background: #28a745; }
+    #downloadBtn:hover { background: #1e7e34; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- LEFT: FORM -->
+  <!-- LEFT FORM -->
   <div class="form-section">
     <h2>Invoice Form</h2>
     <label for="institutionSelect">Institution</label>
-    <select id="institutionSelect">
-      <option value="">-- Select Institution --</option>
-    </select>
+    <select id="institutionSelect"><option value="">-- Select Institution --</option></select>
+
+    <label for="applicantSelect">Applicant Name</label>
+    <select id="applicantSelect" disabled><option value="">-- Select Applicant --</option></select>
 
     <label for="eventSelect">Event</label>
-    <select id="eventSelect" disabled>
-      <option value="">-- Select Event --</option>
-    </select>
+    <select id="eventSelect" disabled><option value="">-- Select Event --</option></select>
 
     <label for="descSelect">Venue & Services</label>
-    <select id="descSelect" disabled>
-      <option value="">-- Select --</option>
-    </select>
+    <select id="descSelect" disabled><option value="">-- Select --</option></select>
+
+    <label for="serviceSelect">Additional Services</label>
+    <select id="serviceSelect" disabled><option value="">-- Select --</option></select>
 
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
@@ -151,93 +59,52 @@
     <button onclick="generateInvoice()">Generate Invoice</button>
   </div>
 
+  <!-- RIGHT PREVIEW -->
   <div class="preview-section">
-  <div id="invoice" class="invoice">
-  <div class="invoice-content">
-    <!-- LOGO CENTER -->
-    <div style="text-align:center; margin:10px 0;">
-      <img src="logo1.jpg" alt="Logo" style="height:70px;">
+    <div id="invoice" class="invoice">
+      <div class="invoice-content">
+        <!-- HEADER -->
+        <table style="width:100%; border-collapse: collapse;">
+          <tr>
+            <td style="width:70%; vertical-align: top;">
+              <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
+              <p>P.O.BOX MB 28</p>
+              <p>MINISTRIES – ACCRA</p>
+              <p>Contact: 0244202959, 0244660848</p>
+              <p>Email: hospitality@gtec.edu.gh</p>
+              <p><b>Applicant:</b> <span id="applicantName"></span></p>
+            </td>
+            <td style="width:30%; border:1px solid #000; padding:5px;">
+              <p><b>Invoice No.:</b> <span id="invNo"></span></p>
+              <p><b>Dated:</b> <span id="invDate"></span></p>
+            </td>
+          </tr>
+        </table>
+
+        <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
+
+        <!-- TABLE -->
+        <table style="width:100%; border-collapse: collapse;" border="1">
+          <tr>
+            <th style="width:10%;">SI No.</th>
+            <th style="width:70%;">DESCRIPTION</th>
+            <th style="width:20%;">AMOUNT</th>
+          </tr>
+          <tr>
+            <td id="siCell"></td>
+            <td>
+              <div><span id="eventDesc"></span></div>
+              <div><b>Additional Services:</b> <span id="serviceDesc"></span></div>
+            </td>
+            <td id="amount"></td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
+            <td id="total"></td>
+          </tr>
+        </table>
+      </div>
     </div>
-    <!-- HEADER -->
-    <table style="width:100%; border-collapse: collapse;">
-      <tr>
-        <td style="width:70%; vertical-align: top;">
-          <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
-          <p>P.O.BOX MB 28</p>
-          <p>MINISTRIES – ACCRA</p>
-          <p>Contact: 0244202959, 0244660848</p>
-          <p>Email: hospitality@gtec.edu.gh</p>
-          <p><b>COORDINATOR :</b> _____________________</p>
-        </td>
-        <td style="width:30%; border:1px solid #000; padding:5px;">
-          <p><b>Invoice No.:</b> <span id="invNo"></span></p>
-          <p><b>Dated:</b> <span id="invDate"></span></p>
-          <p><b>Delivery No.:</b> <span id="deliveryNoCell"></span></p>
-        </td>
-      </tr>
-    </table>
-
-    
-
-    <!-- INVOICE TITLE -->
-    <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
-
-    <!-- INVOICE TABLE -->
-    <table style="width:100%; border-collapse: collapse;" border="1">
-      <tr>
-        <th style="width:10%;">SI No.</th>
-        <th style="width:70%;">DESCRIPTION</th>
-        <th style="width:20%;">AMOUNT</th>
-      </tr>
-      <tr>
-        <td id="siCell"></td>
-        <td style="position:relative;">
-          <span id="eventDesc"></span>
-          <!-- Watermark -->
-          <img src="logo1.jpg" style="opacity:0.1; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); height:100px;">
-        </td>
-        <td id="amount"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
-        <td id="total"></td>
-      </tr>
-    </table>
-<br>
-    <br>
-    <br>
-    <!-- FOOTER -->
-    <table style="width:100%; margin-top:20px; border-collapse: collapse;">
-      <tr>
-        <!-- Kindly Note -->
-        <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
-          <p><i><b>KINDLY NOTE:</b></i></p>
-          <ol style="margin:0; padding-left:15px;">
-            <li>A refundable Deposit of 10% of the total cost is required to be paid by cash</li>
-            <li>50% payment is required to secure the venue</li>
-            <li>Full payment should be made before the actual date of the programme</li>
-          </ol>
-        </td>
-        <!-- Bank Details -->
-        <td style="width:45%; border:1px solid #000; padding:0;">
-          <table style="width:100%; border-collapse: collapse;" border="1">
-            <tr><td><b>A/c Holder’s Name</b></td><td>GTEC CONFERENCE</td></tr>
-            <tr><td><b>Bank Name</b></td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
-            <tr><td><b>A/c No.</b></td><td>0701010009158801</td></tr>
-            <tr><td><b>Branch & Bank Code</b></td><td>Gulf House</td></tr>
-            <tr><td><b>SWIFT CODE</b></td><td>________________</td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-
-    <!-- SIGNATURE -->
-    <div style="text-align:right; margin-top:40px;">
-      Signature: .................................
-    </div>
-  </div>
-</div>
-
     <button id="downloadBtn">Download PDF</button>
   </div>
 </div>
@@ -249,8 +116,6 @@
   document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch(sheetCSV);
     const csvText = await res.text();
-
-    // Parse CSV → JSON
     const rows = csvText.trim().split("\n").map(r => r.split(","));
     const headers = rows[0];
     bookings = rows.slice(1).map(r => {
@@ -258,7 +123,6 @@
       headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
       return obj;
     });
-
     populateInstitutions();
   });
 
@@ -276,36 +140,52 @@
 
   function onInstitutionChange() {
     const inst = document.getElementById("institutionSelect").value;
+    const applicantSelect = document.getElementById("applicantSelect");
     const eventSelect = document.getElementById("eventSelect");
     const descSelect = document.getElementById("descSelect");
+    const serviceSelect = document.getElementById("serviceSelect");
+
+    applicantSelect.innerHTML = '<option value="">-- Select Applicant --</option>';
     eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
     descSelect.innerHTML = '<option value="">-- Select --</option>';
+    serviceSelect.innerHTML = '<option value="">-- Select --</option>';
 
-    if (!inst) { eventSelect.disabled = true; descSelect.disabled = true; return; }
+    if (!inst) { applicantSelect.disabled = eventSelect.disabled = descSelect.disabled = serviceSelect.disabled = true; return; }
 
     const filtered = bookings.filter(b => b["Name of Institution/Organization/Person"] === inst);
 
     filtered.forEach(b => {
+      const aOpt = document.createElement("option");
+      aOpt.value = b["Applicant Name"];
+      aOpt.textContent = b["Applicant Name"];
+      applicantSelect.appendChild(aOpt);
+
       const eOpt = document.createElement("option");
       eOpt.value = b["ID"];
       eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
       eventSelect.appendChild(eOpt);
 
       const dOpt = document.createElement("option");
-      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`;
-      dOpt.textContent = `${b["Venue"]} - ${b["Additional Services"]}`;
+      dOpt.value = b["Venue"];
+      dOpt.textContent = b["Venue"];
       descSelect.appendChild(dOpt);
+
+      const sOpt = document.createElement("option");
+      sOpt.value = b["Additional Services"];
+      sOpt.textContent = b["Additional Services"];
+      serviceSelect.appendChild(sOpt);
     });
 
-    eventSelect.disabled = false;
-    descSelect.disabled = false;
+    applicantSelect.disabled = eventSelect.disabled = descSelect.disabled = serviceSelect.disabled = false;
   }
 
   function generateInvoice() {
     document.getElementById("invNo").textContent = document.getElementById("invoiceId").value;
     document.getElementById("invDate").textContent = document.getElementById("dated").value || new Date().toLocaleDateString();
     document.getElementById("siCell").textContent = document.getElementById("siNo").value;
+    document.getElementById("applicantName").textContent = document.getElementById("applicantSelect").value;
     document.getElementById("eventDesc").textContent = document.getElementById("descSelect").value;
+    document.getElementById("serviceDesc").textContent = document.getElementById("serviceSelect").value;
     document.getElementById("amount").textContent = document.getElementById("amountInput").value;
     document.getElementById("total").textContent = document.getElementById("totalInput").value;
 
@@ -318,13 +198,5 @@
     html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
   });
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
