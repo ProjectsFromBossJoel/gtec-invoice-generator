@@ -251,8 +251,10 @@
 </div>
 
 <script>
-  const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
+  const sheetCSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
   let bookings = [];
+  let additionalServicesKey = "additional services"; // default normalized key
 
   document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -260,15 +262,26 @@
       if (!res.ok) throw new Error("Failed to fetch CSV");
       const csvText = await res.text();
 
-      // Parse CSV → JSON
       const rows = csvText.trim().split("\n").map(r => r.split(","));
-      const headers = rows[0];
+      const headers = rows[0].map(h => h.trim().toLowerCase());
+
+      // Detect which header corresponds to Additional Services / Refreshment
+      const knownKeys = ["additional services", "refreshment", "refreshments"];
+      const found = headers.find(h => knownKeys.includes(h));
+      if (found) additionalServicesKey = found;
+      else {
+        // fallback to column index if missing (e.g., 16th column)
+        additionalServicesKey = headers[15] || headers[headers.length - 1];
+      }
+
       bookings = rows.slice(1).map(r => {
-        let obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
+        const obj = {};
+        headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
         return obj;
       });
 
+      console.log("Detected additional services key:", additionalServicesKey);
+      console.log("Headers detected:", headers);
       populateInstitutions();
     } catch (err) {
       console.error(err);
@@ -278,7 +291,7 @@
 
   function populateInstitutions() {
     const instSet = new Set(
-      bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean)
+      bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
     );
     const instSelect = document.getElementById("institutionSelect");
     instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
@@ -297,7 +310,6 @@
     const descSelect = document.getElementById("descSelect");
     const serviceSelect = document.getElementById("serviceSelect");
 
-    // Reset dropdowns
     eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
     descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
     serviceSelect.innerHTML = '<option value="">-- Select Services --</option>';
@@ -309,28 +321,28 @@
     if (!inst) return;
 
     const filtered = bookings.filter(
-      b => b["Name of Institution/Organization/Person"] === inst
+      b => b["name of institution/organization/person"] === inst
     );
 
-    // Collect unique services
     const servicesSet = new Set();
 
     filtered.forEach(b => {
       // Events
       const eOpt = document.createElement("option");
-      eOpt.value = b["ID"];
-      eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
+      eOpt.value = b["id"];
+      eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
       eventSelect.appendChild(eOpt);
 
-      // Venue
+      // Venues
       const dOpt = document.createElement("option");
-      dOpt.value = b["Venue"];
-      dOpt.textContent = b["Venue"];
+      dOpt.value = b["venue"];
+      dOpt.textContent = b["venue"];
       descSelect.appendChild(dOpt);
 
       // Additional Services
-      if (b["Additional Services"]) {
-        b["Additional Services"]
+      const servicesRaw = b[additionalServicesKey] || "";
+      if (servicesRaw) {
+        servicesRaw
           .split(/[;,]/)
           .map(s => s.trim())
           .filter(Boolean)
@@ -338,7 +350,6 @@
       }
     });
 
-    // Populate services dropdown if available
     if (servicesSet.size > 0) {
       servicesSet.forEach(service => {
         const opt = document.createElement("option");
@@ -367,7 +378,6 @@
     document.getElementById("siCell").textContent =
       document.getElementById("siNo").value;
 
-    // Combine venue and selected services for description
     const venue = document.getElementById("descSelect").value;
     document.getElementById("eventDesc").textContent = selectedServices
       ? `${venue} | Services: ${selectedServices}`
@@ -389,7 +399,9 @@
 </script>
 
 
+
 </body>
 </html>
+
 
 
