@@ -133,6 +133,14 @@
       <option value="">-- Select Venue--</option>
     </select>
 
+
+<label for="allDataSelect">All Data</label>
+<select id="allDataSelect" size="6" disabled>
+  <option value="">-- All Data --</option>
+</select>
+
+
+    
     <label for="serviceSelect">Additional Services</label>
 <select id="serviceSelect" multiple disabled>
   <option value="">-- Select Services --</option>
@@ -309,15 +317,22 @@
   const eventSelect = document.getElementById("eventSelect");
   const descSelect = document.getElementById("descSelect");
   const serviceSelect = document.getElementById("serviceSelect");
+  const refreshSelect = document.getElementById("refreshSelect");
+  const allDataSelect = document.getElementById("allDataSelect");
 
+  // Clear all dropdowns
   eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
   descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
-  serviceSelect.innerHTML = ''; // clear previous services
+  serviceSelect.innerHTML = '';
+  refreshSelect.innerHTML = '';
+  allDataSelect.innerHTML = '<option value="">-- All Data --</option>';
 
   if (!inst) {
     eventSelect.disabled = true;
     descSelect.disabled = true;
     serviceSelect.disabled = true;
+    refreshSelect.disabled = true;
+    allDataSelect.disabled = true;
     return;
   }
 
@@ -338,20 +353,46 @@
     dOpt.textContent = b["venue"];
     descSelect.appendChild(dOpt);
 
-    // Additional services (split by comma if multiple)
-   const services = b["additional services"] ? b["additional services"].split(",") : [];
+    // Additional Services
+    const services = b["additional services"]
+      ? b["additional services"].split(",")
+      : [];
     services.forEach(s => {
       const sOpt = document.createElement("option");
       sOpt.value = s.trim();
       sOpt.textContent = s.trim();
       serviceSelect.appendChild(sOpt);
     });
+
+    // For Refreshment (Optional)
+    const refreshValues = b["for refreshment (optional)"]
+      ? b["for refreshment (optional)"].split(",")
+      : [];
+    refreshValues.forEach(r => {
+      const rOpt = document.createElement("option");
+      rOpt.value = r.trim();
+      rOpt.textContent = r.trim();
+      refreshSelect.appendChild(rOpt);
+    });
+
+    // 🔎 Populate All Data Dropdown (key-value pairs)
+    Object.keys(b).forEach(key => {
+      const val = b[key] || "(empty)";
+      const allOpt = document.createElement("option");
+      allOpt.value = `${key}: ${val}`;
+      allOpt.textContent = `${key}: ${val}`;
+      allDataSelect.appendChild(allOpt);
+    });
   });
 
-  serviceSelect.disabled = false;
+  // Enable all dropdowns
   eventSelect.disabled = false;
   descSelect.disabled = false;
+  serviceSelect.disabled = false;
+  refreshSelect.disabled = false;
+  allDataSelect.disabled = false;
 }
+
 
   function generateInvoice() {
     const selectedServices = Array.from(
@@ -391,3 +432,4 @@
 
 </body>
 </html>
+
