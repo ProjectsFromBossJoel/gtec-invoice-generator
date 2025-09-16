@@ -133,14 +133,6 @@
       <option value="">-- Select Venue--</option>
     </select>
 
-
-<label for="allDataSelect">All Data</label>
-<select id="allDataSelect" size="6" disabled>
-  <option value="">-- All Data --</option>
-</select>
-
-
-    
     <label for="serviceSelect">Additional Services</label>
 <select id="serviceSelect" multiple disabled>
   <option value="">-- Select Services --</option>
@@ -312,7 +304,7 @@
     instSelect.onchange = onInstitutionChange;
   }
 
- function onInstitutionChange() {
+  function onInstitutionChange() {
   const inst = document.getElementById("institutionSelect").value;
   const eventSelect = document.getElementById("eventSelect");
   const descSelect = document.getElementById("descSelect");
@@ -337,7 +329,7 @@
     // Event
     const eOpt = document.createElement("option");
     eOpt.value = b["id"];
-    eOpt.textContent = ${b["event description"]} (${b["event start date"]});
+    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
     eventSelect.appendChild(eOpt);
 
     // Venue
@@ -360,7 +352,6 @@
   eventSelect.disabled = false;
   descSelect.disabled = false;
 }
-
 
   function generateInvoice() {
     const selectedServices = Array.from(
@@ -400,6 +391,3 @@
 
 </body>
 </html>
-
-
-
