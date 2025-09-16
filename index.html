@@ -255,24 +255,33 @@
   let bookings = [];
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const res = await fetch(sheetCSV);
-    const csvText = await res.text();
+    try {
+      const res = await fetch(sheetCSV);
+      if (!res.ok) throw new Error("Failed to fetch CSV");
+      const csvText = await res.text();
 
-    // Parse CSV → JSON
-    const rows = csvText.trim().split("\n").map(r => r.split(","));
-    const headers = rows[0];
-    bookings = rows.slice(1).map(r => {
-      let obj = {};
-      headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
-      return obj;
-    });
+      // Parse CSV → JSON
+      const rows = csvText.trim().split("\n").map(r => r.split(","));
+      const headers = rows[0];
+      bookings = rows.slice(1).map(r => {
+        let obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = r[i] ? r[i].trim() : "");
+        return obj;
+      });
 
-    populateInstitutions();
+      populateInstitutions();
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load data from the sheet.");
+    }
   });
 
   function populateInstitutions() {
-    const instSet = new Set(bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean));
+    const instSet = new Set(
+      bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean)
+    );
     const instSelect = document.getElementById("institutionSelect");
+    instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
     instSet.forEach(inst => {
       const opt = document.createElement("option");
       opt.value = inst;
@@ -286,36 +295,88 @@
     const inst = document.getElementById("institutionSelect").value;
     const eventSelect = document.getElementById("eventSelect");
     const descSelect = document.getElementById("descSelect");
+    const serviceSelect = document.getElementById("serviceSelect");
+
+    // Reset dropdowns
     eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-    descSelect.innerHTML = '<option value="">-- Select --</option>';
+    descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
+    serviceSelect.innerHTML = '<option value="">-- Select Services --</option>';
 
-    if (!inst) { eventSelect.disabled = true; descSelect.disabled = true; return; }
+    eventSelect.disabled = true;
+    descSelect.disabled = true;
+    serviceSelect.disabled = true;
 
-    const filtered = bookings.filter(b => b["Name of Institution/Organization/Person"] === inst);
+    if (!inst) return;
+
+    const filtered = bookings.filter(
+      b => b["Name of Institution/Organization/Person"] === inst
+    );
+
+    // Collect unique services
+    const servicesSet = new Set();
 
     filtered.forEach(b => {
+      // Events
       const eOpt = document.createElement("option");
       eOpt.value = b["ID"];
       eOpt.textContent = `${b["Event Description"]} (${b["Event Start Date"]})`;
       eventSelect.appendChild(eOpt);
 
+      // Venue
       const dOpt = document.createElement("option");
-      dOpt.value = `${b["Venue"]} - ${b["Additional Services"]}`;
-      dOpt.textContent = `${b["Venue"]} - ${b["Additional Services"]}`;
+      dOpt.value = b["Venue"];
+      dOpt.textContent = b["Venue"];
       descSelect.appendChild(dOpt);
+
+      // Additional Services
+      if (b["Additional Services"]) {
+        b["Additional Services"]
+          .split(/[;,]/)
+          .map(s => s.trim())
+          .filter(Boolean)
+          .forEach(s => servicesSet.add(s));
+      }
     });
+
+    // Populate services dropdown if available
+    if (servicesSet.size > 0) {
+      servicesSet.forEach(service => {
+        const opt = document.createElement("option");
+        opt.value = service;
+        opt.textContent = service;
+        serviceSelect.appendChild(opt);
+      });
+      serviceSelect.disabled = false;
+    }
 
     eventSelect.disabled = false;
     descSelect.disabled = false;
   }
 
   function generateInvoice() {
-    document.getElementById("invNo").textContent = document.getElementById("invoiceId").value;
-    document.getElementById("invDate").textContent = document.getElementById("dated").value || new Date().toLocaleDateString();
-    document.getElementById("siCell").textContent = document.getElementById("siNo").value;
-    document.getElementById("eventDesc").textContent = document.getElementById("descSelect").value;
-    document.getElementById("amount").textContent = document.getElementById("amountInput").value;
-    document.getElementById("total").textContent = document.getElementById("totalInput").value;
+    const selectedServices = Array.from(
+      document.getElementById("serviceSelect").selectedOptions
+    )
+      .map(opt => opt.value)
+      .join(", ");
+
+    document.getElementById("invNo").textContent =
+      document.getElementById("invoiceId").value;
+    document.getElementById("invDate").textContent =
+      document.getElementById("dated").value || new Date().toLocaleDateString();
+    document.getElementById("siCell").textContent =
+      document.getElementById("siNo").value;
+
+    // Combine venue and selected services for description
+    const venue = document.getElementById("descSelect").value;
+    document.getElementById("eventDesc").textContent = selectedServices
+      ? `${venue} | Services: ${selectedServices}`
+      : venue;
+
+    document.getElementById("amount").textContent =
+      document.getElementById("amountInput").value;
+    document.getElementById("total").textContent =
+      document.getElementById("totalInput").value;
 
     document.getElementById("invoice").style.display = "block";
     document.getElementById("downloadBtn").style.display = "inline-block";
@@ -327,6 +388,8 @@
   });
 </script>
 
+
 </body>
 </html>
+
 
