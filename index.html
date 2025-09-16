@@ -138,13 +138,6 @@
   <option value="">-- Select Services --</option>
 </select>
 
-<label for="refreshSelect">For Refreshment (Optional)</label>
-<select id="refreshSelect">
-  <option value="">-- Select Refreshment --</option>
-</select>
-
-    
-
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
 
@@ -258,48 +251,60 @@
 </div>
 
 <script>
-const sheetCSV =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
-let bookings = [];
+  const sheetCSV =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
+  let bookings = [];
+  let additionalServicesKey = "additional services"; // default normalized key
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const res = await fetch(sheetCSV);
-  const csvText = await res.text();
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const res = await fetch(sheetCSV);
+      if (!res.ok) throw new Error("Failed to fetch CSV");
+      const csvText = await res.text();
 
-  // Parse CSV → JSON
-  const rows = csvText.trim().split("\n").map(r => r.split(","));
-  const headers = rows[0]; // use headers as-is (spaces included!)
+      const rows = csvText.trim().split("\n").map(r => r.split(","));
+      const headers = rows[0].map(h => h.trim().toLowerCase());
 
-  bookings = rows.slice(1).map(r => {
-    let obj = {};
-    headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
-    return obj;
+      // Detect which header corresponds to Additional Services / Refreshment
+      const knownKeys = ["additional services", "refreshment", "refreshments"];
+      const found = headers.find(h => knownKeys.includes(h));
+      if (found) additionalServicesKey = found;
+      else {
+        // fallback to column index if missing (e.g., 16th column)
+        additionalServicesKey = headers[15] || headers[headers.length - 1];
+      }
+
+      bookings = rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
+        return obj;
+      });
+
+      console.log("Detected additional services key:", additionalServicesKey);
+      console.log("Headers detected:", headers);
+      populateInstitutions();
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load data from the sheet.");
+    }
   });
 
-  console.log("Headers detected:", headers);
-  console.log("First parsed booking:", bookings[0]);
+  function populateInstitutions() {
+    const instSet = new Set(
+      bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
+    );
+    const instSelect = document.getElementById("institutionSelect");
+    instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
+    instSet.forEach(inst => {
+      const opt = document.createElement("option");
+      opt.value = inst;
+      opt.textContent = inst;
+      instSelect.appendChild(opt);
+    });
+    instSelect.onchange = onInstitutionChange;
+  }
 
-  populateInstitutions();
-});
-
-function populateInstitutions() {
-  const instSet = new Set(
-    bookings.map(b => b["Name of Institution/Organization/Person"]).filter(Boolean)
-  );
-  const instSelect = document.getElementById("institutionSelect");
-  instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
-  instSet.forEach(inst => {
-    const opt = document.createElement("option");
-    opt.value = inst;
-    opt.textContent = inst;
-    instSelect.appendChild(opt);
-  });
-  instSelect.onchange = onInstitutionChange;
-}
-
-}
-
- function onInstitutionChange() {
+  function onInstitutionChange() {
   const inst = document.getElementById("institutionSelect").value;
   const eventSelect = document.getElementById("eventSelect");
   const descSelect = document.getElementById("descSelect");
@@ -324,7 +329,7 @@ function populateInstitutions() {
     // Event
     const eOpt = document.createElement("option");
     eOpt.value = b["id"];
-    eOpt.textContent = ${b["event description"]} (${b["event start date"]});
+    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
     eventSelect.appendChild(eOpt);
 
     // Venue
@@ -364,7 +369,7 @@ function populateInstitutions() {
 
     const venue = document.getElementById("descSelect").value;
     document.getElementById("eventDesc").textContent = selectedServices
-      ? ${venue} | Services: ${selectedServices}
+      ? `${venue} | Services: ${selectedServices}`
       : venue;
 
     document.getElementById("amount").textContent =
@@ -386,22 +391,3 @@ function populateInstitutions() {
 
 </body>
 </html>
-
-</script>
-
-
-
-
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
