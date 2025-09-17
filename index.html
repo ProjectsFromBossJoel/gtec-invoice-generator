@@ -7,388 +7,140 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f7fa;
+      margin: 20px;
     }
-
-    .container {
-      display: flex;
-      height: 100vh;
+    .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #eee;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     }
-
-    .form-section, .preview-section {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .form-section {
-      background: #fff;
-      border-right: 2px solid #ddd;
-    }
-
-    .form-section h2, .preview-section h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #444;
-    }
-
-    select, input {
+    .invoice-box table {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      line-height: inherit;
+      text-align: left;
+      border-collapse: collapse;
     }
-
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: #fff;
-      cursor: pointer;
+    .invoice-box table td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    .invoice-box table tr td:nth-child(2) {
+      text-align: right;
+    }
+    .invoice-box table tr.top table td {
+      padding-bottom: 20px;
+    }
+    .invoice-box table tr.heading td {
+      background: #eee;
+      border-bottom: 1px solid #ddd;
       font-weight: bold;
     }
-
-    button:hover {
-      background: #0056b3;
+    .invoice-box table tr.item td{
+      border-bottom: 1px solid #eee;
     }
-
-    .invoice {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-      display: none;
+    .invoice-box table tr.total td:nth-child(2) {
+      border-top: 2px solid #eee;
+      font-weight: bold;
     }
-
-    .logo {
-      width: 100px;
-      opacity: 0.1;
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-    }
-
-    .invoice-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .invoice-header {
-      text-align: center;
+    .controls {
       margin-bottom: 20px;
-    }
-
-    .invoice-details {
-      margin-bottom: 15px;
-    }
-
-    .invoice-details span {
-      display: inline-block;
-      min-width: 120px;
-      font-weight: bold;
-    }
-
-    #downloadBtn {
-      display: none;
-      margin-top: 10px;
-      background: #28a745;
-    }
-    #downloadBtn:hover {
-      background: #1e7e34;
     }
   </style>
 </head>
 <body>
+  <div class="controls">
+    <label for="venue">Select Venue:</label>
+    <select id="venue"></select>
 
-<div class="container">
-  <!-- LEFT: FORM -->
-  <div class="form-section">
-    <h2>Invoice Form</h2>
-    <label for="institutionSelect">Institution</label>
-    <select id="institutionSelect">
-      <option value="">-- Select Institution --</option>
-    </select>
-
-    <label for="eventSelect">Event</label>
-    <select id="eventSelect" disabled>
-      <option value="">-- Select Event --</option>
-    </select>
-
-    <label for="descSelect">Venue</label>
-    <select id="descSelect" disabled>
-      <option value="">-- Select Venue--</option>
-    </select>
-
-    <label for="serviceSelect">Additional Services</label>
-<select id="serviceSelect" multiple disabled>
-  <option value="">-- Select Services --</option>
-</select>
-
-    <label for="invoiceId">Invoice No.</label>
-    <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
-
-    <label for="dated">Date</label>
-    <input type="date" id="dated">
-
-    <label for="siNo">SI No.</label>
-    <input type="text" id="siNo" placeholder="Enter SI No.">
-
-    <label for="amountInput">Venue Cost</label>
-    <input type="number" id="amountInput" placeholder="Enter Amount">
-
-    <label for="additionalInput">Additional Services Cost</label>
-<input type="number" id="additionalInput" placeholder="Enter Additional Services Cost (sum)">
-
-    <label for="totalInput">Total</label>
-    <input type="number" id="totalInput" placeholder="Enter Total">
+    <label for="services">Select Additional Service:</label>
+    <select id="services"></select>
 
     <button onclick="generateInvoice()">Generate Invoice</button>
   </div>
 
-  <div class="preview-section">
-  <div id="invoice" class="invoice">
-  <div class="invoice-content">
-    <!-- LOGO CENTER -->
-    <div style="text-align:center; margin:10px 0;">
-      <img src="logo1.jpg" alt="Logo" style="height:70px;">
-    </div>
-    <!-- HEADER -->
-    <table style="width:100%; border-collapse: collapse;">
-      <tr>
-        <td style="width:70%; vertical-align: top;">
-          <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
-          <p>P.O.BOX MB 28</p>
-          <p>MINISTRIES – ACCRA</p>
-          <p>Contact: 0244202959, 0244660848</p>
-          <p>Email: hospitality@gtec.edu.gh</p>
-          <p><b>COORDINATOR :</b> _____________________</p>
-        </td>
-        <td style="width:30%; border:1px solid #000; padding:5px;">
-          <p><b>Invoice No.:</b> <span id="invNo"></span></p>
-          <p><b>Dated:</b> <span id="invDate"></span></p>
-          <p><b>Delivery No.:</b> <span id="deliveryNoCell"></span></p>
-        </td>
-      </tr>
-    </table>
+  <div id="invoice" class="invoice-box"></div>
 
-    
+  <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=668353545&single=true&output=csv";
 
-    <!-- INVOICE TITLE -->
-    <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
+    let sheetData = [];
 
-    <!-- INVOICE TABLE -->
-    <table style="width:100%; border-collapse: collapse;" border="1">
-      <tr>
-        <th style="width:10%;">SI No.</th>
-        <th style="width:70%;">DESCRIPTION</th>
-        <th style="width:20%;">AMOUNT</th>
-      </tr>
-      <tr>
-        <td id="siCell"></td>
-        <td style="position:relative;">
-          <span id="eventDesc"></span>
-          <!-- Watermark -->
-          <img src="logo1.jpg" style="opacity:0.1; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); height:100px;">
-        </td>
-        <td id="amount"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
-        <td id="total"></td>
-      </tr>
-    </table>
-<br>
-    <br>
-    <br>
-    <!-- FOOTER -->
-    <table style="width:100%; margin-top:20px; border-collapse: collapse;">
-      <tr>
-        <!-- Kindly Note -->
-        <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
-          <p><i><b>KINDLY NOTE:</b></i></p>
-          <ol style="margin:0; padding-left:15px;">
-            <li>A refundable Deposit of 10% of the total cost is required to be paid by cash</li>
-            <li>50% payment is required to secure the venue</li>
-            <li>Full payment should be made before the actual date of the programme</li>
-          </ol>
-        </td>
-        <!-- Bank Details -->
-        <td style="width:45%; border:1px solid #000; padding:0;">
-          <table style="width:100%; border-collapse: collapse;" border="1">
-            <tr><td><b>A/c Holder’s Name</b></td><td>GTEC CONFERENCE</td></tr>
-            <tr><td><b>Bank Name</b></td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
-            <tr><td><b>A/c No.</b></td><td>0701010009158801</td></tr>
-            <tr><td><b>Branch & Bank Code</b></td><td>Gulf House</td></tr>
-            <tr><td><b>SWIFT CODE</b></td><td>________________</td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    async function loadSheetData() {
+      const response = await fetch(sheetUrl);
+      const data = await response.text();
+      const rows = data.split("\n").map(r => r.split(","));
+      sheetData = rows;
 
-    <!-- SIGNATURE -->
-    <div style="text-align:right; margin-top:40px;">
-      Signature: .................................
-    </div>
-  </div>
-</div>
-
-    <button id="downloadBtn">Download PDF</button>
-  </div>
-</div>
-
-<script>
-  const sheetCSV =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
-  let bookings = [];
-  let additionalServicesKey = "additional services"; // default normalized key
-
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const res = await fetch(sheetCSV);
-      if (!res.ok) throw new Error("Failed to fetch CSV");
-      const csvText = await res.text();
-
-      const rows = csvText.trim().split("\n").map(r => r.split(","));
-      const headers = rows[0].map(h => h.trim().toLowerCase());
-
-      // Detect which header corresponds to Additional Services / Refreshment
-      const knownKeys = ["additional services", "refreshment", "refreshments"];
-      const found = headers.find(h => knownKeys.includes(h));
-      if (found) additionalServicesKey = found;
-      else {
-        // fallback to column index if missing (e.g., 16th column)
-        additionalServicesKey = headers[15] || headers[headers.length - 1];
-      }
-
-      bookings = rows.slice(1).map(r => {
-        const obj = {};
-        headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
-        return obj;
-      });
-
-      console.log("Detected additional services key:", additionalServicesKey);
-      console.log("Headers detected:", headers);
-      populateInstitutions();
-    } catch (err) {
-      console.error(err);
-      alert("Unable to load data from the sheet.");
+      populateDropdowns(rows);
     }
-  });
 
-  function populateInstitutions() {
-    const instSet = new Set(
-      bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
-    );
-    const instSelect = document.getElementById("institutionSelect");
-    instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
-    instSet.forEach(inst => {
-      const opt = document.createElement("option");
-      opt.value = inst;
-      opt.textContent = inst;
-      instSelect.appendChild(opt);
-    });
-    instSelect.onchange = onInstitutionChange;
-  }
+    function populateDropdowns(rows) {
+      const venueSelect = document.getElementById("venue");
+      const servicesSelect = document.getElementById("services");
 
-  function onInstitutionChange() {
-  const inst = document.getElementById("institutionSelect").value;
-  const eventSelect = document.getElementById("eventSelect");
-  const descSelect = document.getElementById("descSelect");
-  const serviceSelect = document.getElementById("serviceSelect");
+      // Assuming first row is headers: Venue, VenueCost, Service, ServiceCost
+      rows.slice(1).forEach(row => {
+        if (row[0]) {
+          let opt = document.createElement("option");
+          opt.value = row[1]; // VenueCost
+          opt.textContent = row[0]; // Venue Name
+          venueSelect.appendChild(opt);
+        }
+        if (row[2]) {
+          let opt = document.createElement("option");
+          opt.value = row[3]; // ServiceCost
+          opt.textContent = row[2]; // Service Name
+          servicesSelect.appendChild(opt);
+        }
+      });
+    }
 
-  eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-  descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
-  serviceSelect.innerHTML = ''; // clear previous services
+    function generateInvoice() {
+      const venueSelect = document.getElementById("venue");
+      const servicesSelect = document.getElementById("services");
 
-  if (!inst) {
-    eventSelect.disabled = true;
-    descSelect.disabled = true;
-    serviceSelect.disabled = true;
-    return;
-  }
+      const venue = venueSelect.options[venueSelect.selectedIndex].text;
+      const venueCost = parseFloat(venueSelect.value) || 0;
 
-  const filtered = bookings.filter(
-    b => b["name of institution/organization/person"] === inst
-  );
+      const service = servicesSelect.options[servicesSelect.selectedIndex].text;
+      const serviceCost = parseFloat(servicesSelect.value) || 0;
 
-  filtered.forEach(b => {
-    // Event
-    const eOpt = document.createElement("option");
-    eOpt.value = b["id"];
-    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
-    eventSelect.appendChild(eOpt);
+      const total = venueCost + serviceCost;
 
-    // Venue
-    const dOpt = document.createElement("option");
-    dOpt.value = b["venue"];
-    dOpt.textContent = b["venue"];
-    descSelect.appendChild(dOpt);
+      const invoice = `
+        <table>
+          <tr class="top">
+            <td colspan="2">
+              <h2>Invoice</h2>
+            </td>
+          </tr>
+          <tr class="heading">
+            <td>Item</td>
+            <td>Price</td>
+          </tr>
+          <tr class="item">
+            <td>${venue}</td>
+            <td>${venueCost.toFixed(2)}</td>
+          </tr>
+          <tr class="item">
+            <td>${service}</td>
+            <td>${serviceCost.toFixed(2)}</td>
+          </tr>
+          <tr class="total">
+            <td>Total</td>
+            <td>${total.toFixed(2)}</td>
+          </tr>
+        </table>
+      `;
 
-    // Additional services (split by comma if multiple)
-   const services = b["additional services"] ? b["additional services"].split(",") : [];
-    services.forEach(s => {
-      const sOpt = document.createElement("option");
-      sOpt.value = s.trim();
-      sOpt.textContent = s.trim();
-      serviceSelect.appendChild(sOpt);
-    });
-  });
+      document.getElementById("invoice").innerHTML = invoice;
 
-  serviceSelect.disabled = false;
-  eventSelect.disabled = false;
-  descSelect.disabled = false;
-}
+      html2pdf().from(document.getElementById("invoice")).save("invoice.pdf");
+    }
 
-  function generateInvoice() {
-    const selectedServices = Array.from(
-      document.getElementById("serviceSelect").selectedOptions
-    )
-      .map(opt => opt.value)
-      .join(", ");
-
-    document.getElementById("invNo").textContent =
-      document.getElementById("invoiceId").value;
-    document.getElementById("invDate").textContent =
-      document.getElementById("dated").value || new Date().toLocaleDateString();
-    document.getElementById("siCell").textContent =
-      document.getElementById("siNo").value;
-
-    const venue = document.getElementById("descSelect").value;
-    document.getElementById("eventDesc").textContent = selectedServices
-      ? `${venue} | Services: ${selectedServices}`
-      : venue;
-
-    document.getElementById("amount").textContent =
-      document.getElementById("amountInput").value;
-    document.getElementById("total").textContent =
-      document.getElementById("totalInput").value;
-
-    document.getElementById("invoice").style.display = "block";
-    document.getElementById("downloadBtn").style.display = "inline-block";
-  }
-
-  document.getElementById("downloadBtn").addEventListener("click", () => {
-    const invoiceElem = document.getElementById("invoice");
-    html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
-  });
-</script>
-
-
-
+    loadSheetData();
+  </script>
 </body>
 </html>
-
