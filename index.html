@@ -123,6 +123,13 @@
       <option value="">-- Select Institution --</option>
     </select>
 
+<label for="applicantSelect">Applicant</label>
+<select id="applicantSelect">
+  <option value="">-- Select Applicant --</option>
+</select>
+
+    
+
     <label for="eventSelect">Event</label>
     <select id="eventSelect" disabled>
       <option value="">-- Select Event --</option>
@@ -175,7 +182,10 @@
           <p>MINISTRIES – ACCRA</p>
           <p>Contact: 0244202959, 0244660848</p>
           <p>Email: hospitality@gtec.edu.gh</p>
-          <p><b>COORDINATOR :</b> _____________________</p>
+          
+          <p><b>Applicant :</b> <span id="applicantName"></span></p>
+
+          
         </td>
         <td style="width:30%; border:1px solid #000; padding:5px;">
           <p><b>Invoice No.:</b> <span id="invNo"></span></p>
@@ -367,10 +377,13 @@
     document.getElementById("siCell").textContent =
       document.getElementById("siNo").value;
 
-    const venue = document.getElementById("descSelect").value;
-    document.getElementById("eventDesc").textContent = selectedServices
-      ? `${venue} | Services: ${selectedServices}`
-      : venue;
+   const venue = document.getElementById("descSelect").value;
+document.getElementById("eventDesc").textContent = venue;
+
+// Applicant
+document.getElementById("applicantName").textContent = document.getElementById("applicantSelect").value;
+
+    
 
     document.getElementById("amount").textContent =
       document.getElementById("amountInput").value;
@@ -391,4 +404,5 @@
 
 </body>
 </html>
+
 
