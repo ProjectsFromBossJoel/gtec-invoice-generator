@@ -123,11 +123,6 @@
       <option value="">-- Select Institution --</option>
     </select>
 
-<label for="applicantSelect">Applicant</label>
-<span id="eventDesc"></span>
-
-    
-
     <label for="eventSelect">Event</label>
     <select id="eventSelect" disabled>
       <option value="">-- Select Event --</option>
@@ -180,10 +175,7 @@
           <p>MINISTRIES – ACCRA</p>
           <p>Contact: 0244202959, 0244660848</p>
           <p>Email: hospitality@gtec.edu.gh</p>
-          
-          <p><b>Applicant :</b> <span id="applicantName"></span></p>
-
-          
+          <p><b>COORDINATOR :</b> _____________________</p>
         </td>
         <td style="width:30%; border:1px solid #000; padding:5px;">
           <p><b>Invoice No.:</b> <span id="invNo"></span></p>
@@ -209,7 +201,6 @@
         <td id="siCell"></td>
         <td style="position:relative;">
           <span id="eventDesc"></span>
-          
           <!-- Watermark -->
           <img src="logo1.jpg" style="opacity:0.1; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); height:100px;">
         </td>
@@ -376,13 +367,10 @@
     document.getElementById("siCell").textContent =
       document.getElementById("siNo").value;
 
-   const venue = document.getElementById("descSelect").value;
-document.getElementById("eventDesc").textContent = venue;
-
-// Applicant
-document.getElementById("applicantName").textContent = document.getElementById("applicantSelect").value;
-
-    
+    const venue = document.getElementById("descSelect").value;
+    document.getElementById("eventDesc").textContent = selectedServices
+      ? `${venue} | Services: ${selectedServices}`
+      : venue;
 
     document.getElementById("amount").textContent =
       document.getElementById("amountInput").value;
@@ -403,6 +391,4 @@ document.getElementById("applicantName").textContent = document.getElementById("
 
 </body>
 </html>
-
-
 
