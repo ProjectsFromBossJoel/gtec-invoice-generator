@@ -119,10 +119,10 @@
       const inst = institutionData.find(row => row[0] === selected);
 
       if (inst) {
-        document.getElementById("instName").textContent = inst[0];
+        document.getElementById("instName").textContent = inst[3];
         document.getElementById("instAddress").textContent = inst[1];
         document.getElementById("instContact").textContent = inst[2];
-        document.getElementById("venueCost").textContent = inst[3];
+        document.getElementById("venueCost").textContent = inst[8];
         document.getElementById("serviceSelect").selectedIndex = 0;
         document.getElementById("serviceCost").value = 0;
         document.getElementById("totalCost").textContent = inst[3];
@@ -150,3 +150,4 @@
   </script>
 </body>
 </html>
+
