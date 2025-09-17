@@ -254,7 +254,6 @@
   const sheetCSV =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLDl2oNe9mONdejXYfXqk3hjdVZUWHsfdN47F54BS4nyufgxV_o2VaCm-upReu1ERhZZQ173TfDJ3B/pub?gid=2055986518&single=true&output=csv";
   let bookings = [];
-  let additionalServicesKey = "additional services"; // default normalized key
 
   document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -265,22 +264,14 @@
       const rows = csvText.trim().split("\n").map(r => r.split(","));
       const headers = rows[0].map(h => h.trim().toLowerCase());
 
-      // Detect which header corresponds to Additional Services / Refreshment
-      const knownKeys = ["additional services", "refreshment", "refreshments"];
-      const found = headers.find(h => knownKeys.includes(h));
-      if (found) additionalServicesKey = found;
-      else {
-        // fallback to column index if missing (e.g., 16th column)
-        additionalServicesKey = headers[15] || headers[headers.length - 1];
-      }
-
+      // Map bookings but use column index for Additional Services (16th column, index 15)
       bookings = rows.slice(1).map(r => {
         const obj = {};
         headers.forEach((h, i) => (obj[h] = r[i] ? r[i].trim() : ""));
+        obj["additional_services"] = r[15] ? r[15].trim() : ""; // fixed column index
         return obj;
       });
 
-      console.log("Detected additional services key:", additionalServicesKey);
       console.log("Headers detected:", headers);
       populateInstitutions();
     } catch (err) {
@@ -305,53 +296,55 @@
   }
 
   function onInstitutionChange() {
-  const inst = document.getElementById("institutionSelect").value;
-  const eventSelect = document.getElementById("eventSelect");
-  const descSelect = document.getElementById("descSelect");
-  const serviceSelect = document.getElementById("serviceSelect");
+    const inst = document.getElementById("institutionSelect").value;
+    const eventSelect = document.getElementById("eventSelect");
+    const descSelect = document.getElementById("descSelect");
+    const serviceSelect = document.getElementById("serviceSelect");
 
-  eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
-  descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
-  serviceSelect.innerHTML = ''; // clear previous services
+    eventSelect.innerHTML = '<option value="">-- Select Event --</option>';
+    descSelect.innerHTML = '<option value="">-- Select Venue --</option>';
+    serviceSelect.innerHTML = ''; // clear previous services
 
-  if (!inst) {
-    eventSelect.disabled = true;
-    descSelect.disabled = true;
-    serviceSelect.disabled = true;
-    return;
-  }
+    if (!inst) {
+      eventSelect.disabled = true;
+      descSelect.disabled = true;
+      serviceSelect.disabled = true;
+      return;
+    }
 
-  const filtered = bookings.filter(
-    b => b["name of institution/organization/person"] === inst
-  );
+    const filtered = bookings.filter(
+      b => b["name of institution/organization/person"] === inst
+    );
 
-  filtered.forEach(b => {
-    // Event
-    const eOpt = document.createElement("option");
-    eOpt.value = b["id"];
-    eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
-    eventSelect.appendChild(eOpt);
+    filtered.forEach(b => {
+      // Event
+      const eOpt = document.createElement("option");
+      eOpt.value = b["id"];
+      eOpt.textContent = `${b["event description"]} (${b["event start date"]})`;
+      eventSelect.appendChild(eOpt);
 
-    // Venue
-    const dOpt = document.createElement("option");
-    dOpt.value = b["venue"];
-    dOpt.textContent = b["venue"];
-    descSelect.appendChild(dOpt);
+      // Venue
+      const dOpt = document.createElement("option");
+      dOpt.value = b["venue"];
+      dOpt.textContent = b["venue"];
+      descSelect.appendChild(dOpt);
 
-    // Additional services (split by comma if multiple)
-   const services = b["additional services"] ? b["additional services"].split(",") : [];
-    services.forEach(s => {
-      const sOpt = document.createElement("option");
-      sOpt.value = s.trim();
-      sOpt.textContent = s.trim();
-      serviceSelect.appendChild(sOpt);
+      // Additional services from fixed column index mapping
+      const services = b["additional_services"]
+        ? b["additional_services"].split(",")
+        : [];
+      services.forEach(s => {
+        const sOpt = document.createElement("option");
+        sOpt.value = s.trim();
+        sOpt.textContent = s.trim();
+        serviceSelect.appendChild(sOpt);
+      });
     });
-  });
 
-  serviceSelect.disabled = false;
-  eventSelect.disabled = false;
-  descSelect.disabled = false;
-}
+    serviceSelect.disabled = false;
+    eventSelect.disabled = false;
+    descSelect.disabled = false;
+  }
 
   function generateInvoice() {
     const selectedServices = Array.from(
@@ -389,6 +382,8 @@
 
 
 
+
 </body>
 </html>
+
 
