@@ -10,137 +10,143 @@
       margin: 20px;
     }
     .invoice-box {
+      border: 1px solid #eee;
+      padding: 20px;
       max-width: 800px;
       margin: auto;
-      padding: 30px;
-      border: 1px solid #eee;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     }
-    .invoice-box table {
+    table {
       width: 100%;
-      line-height: inherit;
-      text-align: left;
       border-collapse: collapse;
     }
-    .invoice-box table td {
-      padding: 5px;
-      vertical-align: top;
+    table, th, td {
+      border: 1px solid black;
     }
-    .invoice-box table tr td:nth-child(2) {
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    .total {
       text-align: right;
     }
-    .invoice-box table tr.top table td {
-      padding-bottom: 20px;
-    }
-    .invoice-box table tr.heading td {
-      background: #eee;
-      border-bottom: 1px solid #ddd;
-      font-weight: bold;
-    }
-    .invoice-box table tr.item td{
-      border-bottom: 1px solid #eee;
-    }
-    .invoice-box table tr.total td:nth-child(2) {
-      border-top: 2px solid #eee;
-      font-weight: bold;
-    }
-    .controls {
-      margin-bottom: 20px;
+    .download-btn {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="controls">
-    <label for="venue">Select Venue:</label>
-    <select id="venue"></select>
-
-    <label for="services">Select Additional Service:</label>
-    <select id="services"></select>
-
-    <button onclick="generateInvoice()">Generate Invoice</button>
+  <h2>Invoice Generator</h2>
+  
+  <label for="institutionSelect">Select Institution:</label>
+  <select id="institutionSelect" onchange="updateInvoice()">
+    <option value="">--Select--</option>
+  </select>
+  
+  <div id="invoice" class="invoice-box">
+    <h2 style="text-align:center;">INVOICE</h2>
+    <p><b>INSTITUTION NAME :</b> <span id="instName"></span></p>
+    <p><b>COORDINATOR :</b> <span id="coordName">_____________________</span></p>
+    <p><b>ADDRESS :</b> <span id="instAddress"></span></p>
+    <p><b>CONTACT :</b> <span id="instContact"></span></p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Particulars</th>
+          <th>Cost (GHS)</th>
+        </tr>
+      </thead>
+      <tbody id="invoiceTable">
+        <tr>
+          <td>Venue</td>
+          <td id="venueCost"></td>
+        </tr>
+        <tr>
+          <td>Additional Services</td>
+          <td>
+            <select id="serviceSelect" onchange="updateServiceCost()">
+              <option value="0">--Select--</option>
+            </select>
+            <input type="number" id="serviceCost" value="0" readonly>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="total"><b>Total</b></td>
+          <td id="totalCost"></td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
-
-  <div id="invoice" class="invoice-box"></div>
+  
+  <button class="download-btn" onclick="generateInvoice()">Download Invoice</button>
 
   <script>
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=668353545&single=true&output=csv";
+    const sheetCSV =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=668353545&single=true&output=csv";
 
-    let sheetData = [];
+    let institutionData = [];
 
-    async function loadSheetData() {
-      const response = await fetch(sheetUrl);
+    async function fetchCSV() {
+      const response = await fetch(sheetCSV);
       const data = await response.text();
-      const rows = data.split("\n").map(r => r.split(","));
-      sheetData = rows;
+      const rows = data.split("\n").map(row => row.split(","));
+      
+      institutionData = rows.slice(1); // Skip header row
+      
+      const select = document.getElementById("institutionSelect");
+      institutionData.forEach(row => {
+        const option = document.createElement("option");
+        option.value = row[0];
+        option.textContent = row[0];
+        select.appendChild(option);
+      });
 
-      populateDropdowns(rows);
-    }
-
-    function populateDropdowns(rows) {
-      const venueSelect = document.getElementById("venue");
-      const servicesSelect = document.getElementById("services");
-
-      // Assuming first row is headers: Venue, VenueCost, Service, ServiceCost
-      rows.slice(1).forEach(row => {
-        if (row[0]) {
-          let opt = document.createElement("option");
-          opt.value = row[1]; // VenueCost
-          opt.textContent = row[0]; // Venue Name
-          venueSelect.appendChild(opt);
-        }
-        if (row[2]) {
-          let opt = document.createElement("option");
-          opt.value = row[3]; // ServiceCost
-          opt.textContent = row[2]; // Service Name
-          servicesSelect.appendChild(opt);
+      const serviceSelect = document.getElementById("serviceSelect");
+      institutionData.forEach(row => {
+        if (row[4]) { // Service name exists
+          const option = document.createElement("option");
+          option.value = row[5] || 0; // Cost
+          option.textContent = row[4]; // Service name
+          serviceSelect.appendChild(option);
         }
       });
     }
 
-    function generateInvoice() {
-      const venueSelect = document.getElementById("venue");
-      const servicesSelect = document.getElementById("services");
+    function updateInvoice() {
+      const selected = document.getElementById("institutionSelect").value;
+      const inst = institutionData.find(row => row[0] === selected);
 
-      const venue = venueSelect.options[venueSelect.selectedIndex].text;
-      const venueCost = parseFloat(venueSelect.value) || 0;
-
-      const service = servicesSelect.options[servicesSelect.selectedIndex].text;
-      const serviceCost = parseFloat(servicesSelect.value) || 0;
-
-      const total = venueCost + serviceCost;
-
-      const invoice = `
-        <table>
-          <tr class="top">
-            <td colspan="2">
-              <h2>Invoice</h2>
-            </td>
-          </tr>
-          <tr class="heading">
-            <td>Item</td>
-            <td>Price</td>
-          </tr>
-          <tr class="item">
-            <td>${venue}</td>
-            <td>${venueCost.toFixed(2)}</td>
-          </tr>
-          <tr class="item">
-            <td>${service}</td>
-            <td>${serviceCost.toFixed(2)}</td>
-          </tr>
-          <tr class="total">
-            <td>Total</td>
-            <td>${total.toFixed(2)}</td>
-          </tr>
-        </table>
-      `;
-
-      document.getElementById("invoice").innerHTML = invoice;
-
-      html2pdf().from(document.getElementById("invoice")).save("invoice.pdf");
+      if (inst) {
+        document.getElementById("instName").textContent = inst[0];
+        document.getElementById("instAddress").textContent = inst[1];
+        document.getElementById("instContact").textContent = inst[2];
+        document.getElementById("venueCost").textContent = inst[3];
+        document.getElementById("serviceSelect").selectedIndex = 0;
+        document.getElementById("serviceCost").value = 0;
+        document.getElementById("totalCost").textContent = inst[3];
+      }
     }
 
-    loadSheetData();
+    function updateServiceCost() {
+      const serviceCost = parseFloat(document.getElementById("serviceSelect").value) || 0;
+      document.getElementById("serviceCost").value = serviceCost;
+
+      const venueCost = parseFloat(document.getElementById("venueCost").textContent) || 0;
+      const total = venueCost + serviceCost;
+      document.getElementById("totalCost").textContent = total;
+    }
+
+    function generateInvoice() {
+      // Coordinator name = selected institution
+      document.getElementById("coordName").textContent = document.getElementById("institutionSelect").value;
+
+      const element = document.getElementById("invoice");
+      html2pdf().from(element).save("invoice.pdf");
+    }
+
+    fetchCSV();
   </script>
 </body>
 </html>
