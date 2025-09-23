@@ -134,9 +134,11 @@
     </select>
 
     <label for="serviceSelect">Additional Services</label>
-<select id="serviceSelect" multiple disabled>
-  <option value="">-- Select Services --</option>
+<select id="serviceSelect">
+  <option value="">-- Select Service --</option>
+  <option value="Additional Services">Additional Services</option>
 </select>
+
 
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
@@ -347,25 +349,25 @@
     descSelect.disabled = false;
   }
 
-  function generateInvoice() {
-    const selectedServices = Array.from(
-      document.getElementById("serviceSelect").selectedOptions
-    )
-      .map(opt => opt.value)
-      .join(", ");
 
-    document.getElementById("invNo").textContent =
-      document.getElementById("invoiceId").value;
-    document.getElementById("invDate").textContent =
-      document.getElementById("dated").value || new Date().toLocaleDateString();
-    document.getElementById("siCell").textContent =
-      document.getElementById("siNo").value;
+  
+function generateInvoice() {
+  const selectedService = document.getElementById("serviceSelect").value;
 
-    const venue = document.getElementById("descSelect").value;
-    document.getElementById("eventDesc").textContent = selectedServices
-      ? `${venue} | Services: ${selectedServices}`
-      : venue;
+  document.getElementById("invNo").textContent =
+    document.getElementById("invoiceId").value;
+  document.getElementById("invDate").textContent =
+    document.getElementById("dated").value || new Date().toLocaleDateString();
+  document.getElementById("siCell").textContent =
+    document.getElementById("siNo").value;
 
+  const venue = document.getElementById("descSelect").value;
+  document.getElementById("eventDesc").textContent = selectedService
+    ? `${venue} | ${selectedService}`
+    : venue;
+
+  
+  
     // Get numeric values
     const venueCost = parseFloat(document.getElementById("amountInput").value) || 0;
     const servicesCost = parseFloat(document.getElementById("additionalInput").value) || 0;
@@ -396,6 +398,7 @@
 
 </body>
 </html>
+
 
 
 
