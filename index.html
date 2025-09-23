@@ -140,12 +140,16 @@
 
 
 <<<<<!-- Additional Services -->>>>
-<label>Additional Services</label><br>
-<input type="radio" id="serviceYes" name="additionalService" value="Yes" onchange="updateAdditionalService()">
-<label for="serviceYes">Yes</label>
+<!-- Additional Services -->
+<label for="serviceSelect">Additional Services</label>
+<select id="serviceSelect" onchange="updateAdditionalService()">
+  <option value="No">No</option>
+  <option value="Yes">Yes</option>
+</select>
 
-<input type="radio" id="serviceNo" name="additionalService" value="No" onchange="updateAdditionalService()" checked>
-<label for="serviceNo">No</label>
+<!-- Where it shows in preview -->
+<p id="servicePreview"></p>
+
 
     
 
@@ -295,18 +299,17 @@
 
 
 
-let additionalServiceText = "";
-
 function updateAdditionalService() {
-  const yesSelected = document.getElementById("serviceYes").checked;
-  additionalServiceText = yesSelected ? "Additional Services" : "";
-  updateInvoicePreview();
+  const selected = document.getElementById("serviceSelect").value;
+  const preview = document.getElementById("servicePreview");
+
+  if (selected === "Yes") {
+    preview.innerText = "Additional Services";
+  } else {
+    preview.innerText = ""; // nothing shows if No
+  }
 }
 
-function updateInvoicePreview() {
-  // example: assume you have an element where invoice details show
-  document.getElementById("servicePreview").innerText = additionalServiceText;
-}
 
 
   
@@ -429,6 +432,7 @@ function generateInvoice() {
 
 </body>
 </html>
+
 
 
 
