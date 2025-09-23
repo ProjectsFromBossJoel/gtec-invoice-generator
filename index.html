@@ -366,14 +366,24 @@
       ? `${venue} | Services: ${selectedServices}`
       : venue;
 
-    document.getElementById("amount").textContent =
-      document.getElementById("amountInput").value;
-    document.getElementById("total").textContent =
-      document.getElementById("totalInput").value;
+    // Get numeric values
+    const venueCost = parseFloat(document.getElementById("amountInput").value) || 0;
+    const servicesCost = parseFloat(document.getElementById("additionalInput").value) || 0;
+
+    // Calculate total
+    const totalCost = venueCost + servicesCost;
+
+    // Set values in the invoice preview
+    document.getElementById("amount").textContent = venueCost.toFixed(2);
+    document.getElementById("total").textContent = totalCost.toFixed(2);
+
+    // Also update total input field (optional, if user wants to see)
+    document.getElementById("totalInput").value = totalCost.toFixed(2);
 
     document.getElementById("invoice").style.display = "block";
     document.getElementById("downloadBtn").style.display = "inline-block";
-  }
+}
+
 
   document.getElementById("downloadBtn").addEventListener("click", () => {
     const invoiceElem = document.getElementById("invoice");
@@ -386,6 +396,7 @@
 
 </body>
 </html>
+
 
 
 
