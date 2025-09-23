@@ -139,6 +139,17 @@
 </select>
 
 
+<<<<<!-- Additional Services -->>>>
+<label>Additional Services</label><br>
+<input type="radio" id="serviceYes" name="additionalService" value="Yes" onchange="updateAdditionalService()">
+<label for="serviceYes">Yes</label>
+
+<input type="radio" id="serviceNo" name="additionalService" value="No" onchange="updateAdditionalService()" checked>
+<label for="serviceNo">No</label>
+
+    
+
+
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
 
@@ -282,6 +293,27 @@
     }
   });
 
+
+
+let additionalServiceText = "";
+
+function updateAdditionalService() {
+  const yesSelected = document.getElementById("serviceYes").checked;
+  additionalServiceText = yesSelected ? "Additional Services" : "";
+  updateInvoicePreview();
+}
+
+function updateInvoicePreview() {
+  // example: assume you have an element where invoice details show
+  document.getElementById("servicePreview").innerText = additionalServiceText;
+}
+
+
+  
+  
+
+  
+
   function populateInstitutions() {
     const instSet = new Set(
       bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
@@ -397,6 +429,7 @@ function generateInvoice() {
 
 </body>
 </html>
+
 
 
 
