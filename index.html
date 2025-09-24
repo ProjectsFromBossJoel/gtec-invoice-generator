@@ -389,9 +389,19 @@ function generateInvoice() {
   document.getElementById("siCell").textContent =
     document.getElementById("siNo").value;
 
-  document.getElementById("eventDesc").innerHTML = selectedService
-  ? `${venue}<br>${selectedService}`
-  : venue;
+
+
+
+  
+  const venue = document.getElementById("descSelect").value || "";
+const selectedService = document.getElementById("serviceSelect").value || "";
+
+if (selectedService) {
+  document.getElementById("eventDesc").innerHTML = `${venue}<br>${selectedService}`;
+} else {
+  document.getElementById("eventDesc").innerHTML = venue;
+}
+
 
 
   
@@ -426,6 +436,7 @@ function generateInvoice() {
 
 </body>
 </html>
+
 
 
 
