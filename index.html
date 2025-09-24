@@ -134,21 +134,15 @@
     </select>
 
     <label for="serviceSelect">Additional Services</label>
-<select id="serviceSelect">
-  <option value="Additional Services">Additional Services</option>
-</select>
-
-
-<<<<<!-- Additional Services -->>>>
-<!-- Additional Services -->
-<label for="serviceSelect">Additional Services</label>
 <select id="serviceSelect" onchange="updateAdditionalService()">
+  <option value="">-- Select --</option>
   <option value="No">No</option>
   <option value="Yes">Yes</option>
 </select>
 
 <!-- Where it shows in preview -->
 <p id="servicePreview"></p>
+
 
 
     
@@ -432,6 +426,7 @@ function generateInvoice() {
 
 </body>
 </html>
+
 
 
 
