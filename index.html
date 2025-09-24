@@ -134,19 +134,9 @@
     </select>
 
     <label for="serviceSelect">Additional Services</label>
-<select id="serviceSelect" onchange="updateAdditionalService()">
-  <option value="">-- Select --</option>
-  <option value="No">No</option>
-  <option value="Yes">Yes</option>
+<select id="serviceSelect" multiple disabled>
+  <option value="">-- Select Services --</option>
 </select>
-
-<!-- Where it shows in preview -->
-<p id="servicePreview"></p>
-
-
-
-    
-
 
     <label for="invoiceId">Invoice No.</label>
     <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
@@ -291,26 +281,6 @@
     }
   });
 
-
-
-function updateAdditionalService() {
-  const selected = document.getElementById("serviceSelect").value;
-  const preview = document.getElementById("servicePreview");
-
-  if (selected === "Yes") {
-    preview.innerText = "Additional Services";
-  } else {
-    preview.innerText = ""; // nothing shows if No
-  }
-}
-
-
-
-  
-  
-
-  
-
   function populateInstitutions() {
     const instSet = new Set(
       bookings.map(b => b["name of institution/organization/person"]).filter(Boolean)
@@ -377,35 +347,25 @@ function updateAdditionalService() {
     descSelect.disabled = false;
   }
 
+  function generateInvoice() {
+    const selectedServices = Array.from(
+      document.getElementById("serviceSelect").selectedOptions
+    )
+      .map(opt => opt.value)
+      .join(", ");
 
-  
-function generateInvoice() {
-  const selectedService = document.getElementById("serviceSelect").value;
+    document.getElementById("invNo").textContent =
+      document.getElementById("invoiceId").value;
+    document.getElementById("invDate").textContent =
+      document.getElementById("dated").value || new Date().toLocaleDateString();
+    document.getElementById("siCell").textContent =
+      document.getElementById("siNo").value;
 
-  document.getElementById("invNo").textContent =
-    document.getElementById("invoiceId").value;
-  document.getElementById("invDate").textContent =
-    document.getElementById("dated").value || new Date().toLocaleDateString();
-  document.getElementById("siCell").textContent =
-    document.getElementById("siNo").value;
+    const venue = document.getElementById("descSelect").value;
+    document.getElementById("eventDesc").textContent = selectedServices
+      ? `${venue} | Services: ${selectedServices}`
+      : venue;
 
-
-
-
-  
-  const venue = document.getElementById("descSelect").value || "";
-const selectedService = document.getElementById("serviceSelect").value || "";
-
-if (selectedService) {
-  document.getElementById("eventDesc").innerHTML = `${venue}<br>${selectedService}`;
-} else {
-  document.getElementById("eventDesc").innerHTML = venue;
-}
-
-
-
-  
-  
     // Get numeric values
     const venueCost = parseFloat(document.getElementById("amountInput").value) || 0;
     const servicesCost = parseFloat(document.getElementById("additionalInput").value) || 0;
@@ -437,12 +397,7 @@ if (selectedService) {
 </body>
 </html>
 
-
-
-
-
-
-
+So let's make a new label, Additional Services, there will be two checkboxes, "Yes" and "No". When I select "Yes", "Additional Services" will show in the preview, and if I select "No", nothing shows
 
 
 
