@@ -128,10 +128,40 @@
         <div class="invoice-content">
 
           
-    <!-- LOGO CENTER -->
-    <div style="text-align:center; margin:10px 0;">
-      <img src="logo1.jpg" alt="Logo" style="height:70px;">
-    </div>
+
+          <!-- Watermark Logo -->
+<div id="watermark">
+  <img src="logo1.jpg" alt="Logo">
+</div>
+
+<!-- Header / Logo -->
+<div style="text-align:center; margin:10px 0;">
+  <img src="logo1.jpg" alt="Logo" style="height:70px;">
+</div>
+
+<style>
+  #watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.1;              /* Faint effect */
+    width: 400px;              /* Adjust size */
+    text-align: center;
+    z-index: 0 !important;     /* Keep it above background but behind text */
+    pointer-events: none;
+  }
+
+  #watermark img {
+    width: 100%;
+  }
+</style>
+
+
+
+
+
+          
 
           
     <!-- Sender / Invoice meta -->
@@ -326,4 +356,5 @@
   </script>
 </body>
 </html>
+
 
