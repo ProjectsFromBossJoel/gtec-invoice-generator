@@ -184,12 +184,46 @@
                 <p>Email: hospitality@gtec.edu.gh</p>
               </td>
               <td style="width:30%; border:1px solid #000; padding:5px;">
-                <p><b>Invoice No.:</b> <span id="invNo"></span></p>
+                <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
                 <p><b>Date:</b> <span id="invDate"></span></p>
                 <p><b>SI No.:</b> <span id="siCell"></span></p>
               </td>
             </tr>
           </table>
+  
+
+<script>
+  function generateInvoiceNo() {
+    // Constant prefix
+    const prefix = "GTEC-HMS";
+
+    // Get current year (last 2 digits)
+    const year = new Date().getFullYear().toString().slice(-2);
+
+    // Retrieve last invoice number from localStorage (or DB in real case)
+    let lastNumber = localStorage.getItem("lastInvoiceNumber") || 0;
+
+    // Increment invoice number
+    lastNumber = parseInt(lastNumber) + 1;
+
+    // Format with leading zeros (e.g., 001, 002, 010, 100)
+    const invoiceNumber = String(lastNumber).padStart(3, "0");
+
+    // Save back to localStorage
+    localStorage.setItem("lastInvoiceNumber", lastNumber);
+
+    // Final invoice format
+    return `${prefix}-${year}-${invoiceNumber}`;
+  }
+
+  // Example: put it into your invoice field
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("invoiceNo").textContent = generateInvoiceNo();
+  });
+</script>
+
+  
+  
 
           
           <!-- Recipient details -->
@@ -368,6 +402,7 @@
   </script>
 </body>
 </html>
+
 
 
 
