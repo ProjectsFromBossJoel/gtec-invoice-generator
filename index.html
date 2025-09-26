@@ -88,9 +88,22 @@
       </select>
 
       <label for="venueSelect">Venue Booked</label>
-      <select id="venueSelect" disabled>
-        <option value="">-- Select Venue --</option>
-      </select>
+<select id="venueSelect">
+  <option value="">-- Select Venue --</option>
+  <option value="Effah Hall (Full Auditorium) - With Additional Services">Effah Hall (Full Auditorium) - With Additional Services</option>
+  <option value="Effah Hall (Full Auditorium) - No Additional Services">Effah Hall (Full Auditorium) - No Additional Services</option>
+  <option value="Effah Hall (Ground Floor) - With Additional Services">Effah Hall (Ground Floor) - With Additional Services</option>
+  <option value="Effah Hall (Ground Floor) - No Additional Services">Effah Hall (Ground Floor) - No Additional Services</option>
+  <option value="Ahmed Jinapor Hall">Ahmed Jinapor Hall</option>
+  <option value="Kwame Dattey Hall">Kwame Dattey Hall</option>
+  <option value="Nikoi Kotey Hall">Nikoi Kotey Hall</option>
+</select>
+
+<label for="venueCostInput">Venue Cost</label>
+<input type="number" id="venueCostInput" placeholder="Auto-filled Venue Cost" readonly>
+
+
+      
 
       <label for="serviceInput">Additional Services</label>
       <input type="text" id="serviceInput" placeholder="Enter additional services (if any)">
@@ -263,6 +276,32 @@
       }
     });
 
+
+// Map venue names to their costs
+const venueCosts = {
+  "Effah Hall (Full Auditorium) - With Additional Services": 14000,
+  "Effah Hall (Full Auditorium)- No Additional Services": 12000,
+  "Effah Hall (Ground Floor) - With Additional Services": 12000,
+  "Effah Hall (Ground Floor) - No Additional Services": 10000,
+  "Ahmed Jinapor Hall": 5000,
+  "Kwame Dattey Hall": 3500,
+  "Nikoi Kotey Hall": 2500
+};
+
+document.getElementById("venueSelect").addEventListener("change", function () {
+  const selectedVenue = this.value;
+  const costInput = document.getElementById("venueCostInput");
+
+  if (venueCosts[selectedVenue]) {
+    costInput.value = venueCosts[selectedVenue].toFixed(2);
+  } else {
+    costInput.value = "";
+  }
+});
+
+
+    
+
     function populateInstitutions() {
       const instSet = new Set(entries.map(e => e["name of institution"]).filter(Boolean));
       const instSelect = document.getElementById("institutionSelect");
@@ -382,6 +421,7 @@
   </script>
 </body>
 </html>
+
 
 
 
