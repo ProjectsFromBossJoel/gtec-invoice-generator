@@ -367,12 +367,22 @@
     }
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const invoiceElem = document.getElementById("invoice");
-      html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
-    });
+  const institution = document.getElementById("institutionSelect").value || "Institution";
+  const today = new Date();
+  const dateStr = today.getFullYear() + "-" +
+                  String(today.getMonth() + 1).padStart(2, "0") + "-" +
+                  String(today.getDate()).padStart(2, "0");
+
+  const fileName = `GTEC_Conf_Facility-${institution}-${dateStr}.pdf`.replace(/\s+/g, "_");
+
+  const invoiceElem = document.getElementById("invoice");
+  html2pdf().from(invoiceElem).save(fileName);
+});
+
   </script>
 </body>
 </html>
+
 
 
 
