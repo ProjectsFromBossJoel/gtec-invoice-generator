@@ -114,8 +114,12 @@
       
 
       <label for="serviceInput">Additional Services</label>
-      <input type="text" id="serviceInput" placeholder="Enter additional services (if any)">
+<select id="serviceInput">
+  <option value="">-- None --</option>
+  <option value="Additional Services">Additional Services</option>
+</select>
 
+      
       <label for="recipientName">Invoice Recipient Name</label>
       <input type="text" id="recipientName" placeholder="Recipient Name">
 
@@ -128,12 +132,7 @@
       <label for="dated">Date</label>
       <input type="date" id="dated">
 
-      <label for="venueCostInput">Venue Cost</label>
-      <input type="number" id="venueCostInput" placeholder="Enter Venue Cost">
-
-      <label for="servicesCostInput">Additional Services Cost</label>
-      <input type="number" id="servicesCostInput" placeholder="Enter Additional Services Cost">
-
+      
       <label for="totalInput">Total</label>
       <input type="number" id="totalInput" placeholder="Total" readonly>
 
@@ -431,6 +430,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
