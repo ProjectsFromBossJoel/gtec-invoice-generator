@@ -82,19 +82,44 @@
     <div class="form-section">
       <h2>Invoice Form</h2>
 
-      <label for="institutionSelect">Institution</label>
-      <select id="institutionSelect">
-        <option value="">-- Select Institution --</option>
-      </select>
+      <!-- Institution -->
+<label for="institutionSelect">Institution</label>
+<select id="institutionSelect">
+  <option value="">-- Select Institution --</option>
+</select>
 
-      <label for="venueSelect">Venue Booked</label>
-      <select id="venueSelect" disabled>
-        <option value="">-- Select Venue --</option>
-      </select>
+<!-- Venue from Google Sheet -->
+<label for="venueSelect">Venue Booked (From Institution)</label>
+<select id="venueSelect">
+  <option value="">-- Select Venue --</option>
+</select>
+
+<!-- NEW: Venue for Cost -->
+<label for="venueCostSelect">Venue Booked (For Cost)</label>
+<select id="venueCostSelect">
+  <option value="">-- Select Venue --</option>
+  <option value="Effah Hall (Full Auditorium) - With Additional Services">Effah Hall (Full Auditorium) - With Additional Services</option>
+  <option value="Effah Hall (Full Auditorium) - No Additional Services">Effah Hall (Full Auditorium) - No Additional Services</option>
+  <option value="Effah Hall (Ground Floor) - With Additional Services">Effah Hall (Ground Floor) - With Additional Services</option>
+  <option value="Effah Hall (Ground Floor) - No Additional Services">Effah Hall (Ground Floor) - No Additional Services</option>
+  <option value="Ahmed Jinapor Hall">Ahmed Jinapor Hall</option>
+  <option value="Kwame Dattey Hall">Kwame Dattey Hall</option>
+  <option value="Nikoi Kotey Hall">Nikoi Kotey Hall</option>
+</select>
+
+<!-- Venue Cost -->
+<label for="venueCostInput">Venue Cost</label>
+<input type="number" id="venueCostInput" placeholder="Auto-filled Venue Cost" readonly>
+
+      
 
       <label for="serviceInput">Additional Services</label>
-      <input type="text" id="serviceInput" placeholder="Enter additional services (if any)">
+<select id="serviceInput">
+  <option value="">-- None --</option>
+  <option value="Additional Services">Additional Services</option>
+</select>
 
+      
       <label for="recipientName">Invoice Recipient Name</label>
       <input type="text" id="recipientName" placeholder="Recipient Name">
 
@@ -102,20 +127,12 @@
       <input type="email" id="recipientEmail" placeholder="Recipient Email">
 
       <label for="invoiceId">Invoice No.</label>
-      <input type="text" id="invoiceId" placeholder="Enter Invoice No.">
+      <input type="text" id="invoiceId" readonly>
 
       <label for="dated">Date</label>
       <input type="date" id="dated">
 
-      <label for="siNo">SI No.</label>
-      <input type="text" id="siNo" placeholder="Enter SI No.">
-
-      <label for="venueCostInput">Venue Cost</label>
-      <input type="number" id="venueCostInput" placeholder="Enter Venue Cost">
-
-      <label for="servicesCostInput">Additional Services Cost</label>
-      <input type="number" id="servicesCostInput" placeholder="Enter Additional Services Cost">
-
+      
       <label for="totalInput">Total</label>
       <input type="number" id="totalInput" placeholder="Total" readonly>
 
@@ -126,11 +143,40 @@
     <div class="preview-section">
       <div id="invoice" class="invoice">
         <div class="invoice-content">
-          <!-- Header / Logo -->
-        <div style="text-align:center; margin:10px 0;">
-      <img src="logo1.jpg" alt="Logo" style="height:70px;">
-    </div>
-          
+
+          <!-- Watermark Logo -->
+          <div id="watermark">
+            <img src="logo1.jpg" alt="Logo">
+          </div>
+
+          <style>
+            #invoice {
+              position: relative;
+            }
+            #watermark {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              opacity: 0.08;
+              width: 120px;
+              text-align: center;
+              pointer-events: none;
+              z-index: 0;
+            }
+            #watermark img {
+              width: 100%;
+            }
+            .invoice-content {
+              position: relative;
+              z-index: 1;
+            }
+          </style>
+
+          <!-- Header -->
+          <div class="invoice-header" style="text-align:center; margin:6px 0 12px 0;">
+            <img src="logo1.jpg" alt="Logo" style="height:70px; display:block; margin:0 auto;" crossorigin="anonymous">
+          </div>
 
           <!-- Sender / Invoice meta -->
           <table style="width:100%; border-collapse: collapse;">
@@ -143,52 +189,42 @@
                 <p>Email: hospitality@gtec.edu.gh</p>
               </td>
               <td style="width:30%; border:1px solid #000; padding:5px;">
-                <p><b>Invoice No.:</b> <span id="invNo"></span></p>
+                <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
                 <p><b>Date:</b> <span id="invDate"></span></p>
-                <p><b>SI No.:</b> <span id="siCell"></span></p>
               </td>
             </tr>
           </table>
 
-          
           <!-- Recipient details -->
-            <div style="margin: 20px 0;">
-<p><strong>Bill To:</strong> <span id="billToName"></span></p>
-<p><strong>Email:</strong> <span id="billToEmail"></span></p>
+          <div style="margin: 20px 0;">
+            <p><strong>Bill To:</strong> <span id="billToName"></span></p>
+            <p><strong>Email:</strong> <span id="billToEmail"></span></p>
           </div>
-
-          
 
           <!-- Invoice Title -->
           <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
 
           <!-- Invoice items table -->
-          <table style="width:100%; border-collapse: collapse;" border="1">
+          <table style="width:100%; border-collapse: collapse;" border="1" id="itemsTable">
             <tr>
               <th style="width:10%;">SI No.</th>
               <th style="width:70%;">DESCRIPTION</th>
               <th style="width:20%;">AMOUNT</th>
             </tr>
-            <tr>
-              <td id="siCellRow"></td>
-              <td id="descCell"></td>
-              <td id="amountCell"></td>
-            </tr>
-            <tr>
-              <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
-              <td id="totalCell"></td>
-            </tr>
           </table>
-<br><br><br><br>
-          <!-- Footer (notes, bank details) -->
+          <br><br><br><br>
+
+          <!-- Footer -->
           <table style="width:100%; margin-top:20px; border-collapse: collapse;">
             <tr>
               <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
                 <p><i><b>KINDLY NOTE:</b></i></p>
                 <ol style="margin:0; padding-left:15px;">
+                  <b><i>
                   <li>A refundable Deposit of 10% of the total cost is required to be paid by cash</li>
                   <li>50% payment is required to secure the venue</li>
                   <li>Full payment should be made before the actual date of the programme</li>
+                  </i></b>
                 </ol>
               </td>
               <td style="width:45%; border:1px solid #000; padding:0;">
@@ -203,16 +239,21 @@
             </tr>
           </table>
 
-          <!-- Signature area -->
-          <div style="text-align:right; margin-top:40px;">
-            Signature: ...........................
-          </div>
+          <!-- Signature -->
+         <div style="text-align:right; margin-top:40px;">
+  <p>Signature: ________________________</p>
+  <p style="margin-top:3px; font-size:12px; font-weight:bold;">
+    AG. HEAD, HOSPITALITY MANAGEMENT SERVICES
+  </p>
+</div>
+
+
         </div>
       </div>
-
-      <button id="downloadBtn">Download PDF</button>
     </div>
+    <button id="downloadBtn">Download PDF</button>
   </div>
+  <button id="downloadBtn">Download PDF</button>
 
   <script>
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=201909864&single=true&output=csv";
@@ -235,13 +276,40 @@
           return obj;
         });
 
-        console.log("Loaded entries:", entries);
         populateInstitutions();
       } catch (err) {
         console.error("Error:", err);
         alert("Unable to load data from sheet.");
       }
     });
+
+
+// Map venue names to their costs
+const venueCosts = {
+  "Effah Hall (Full Auditorium) - With Additional Services": 14000,
+  "Effah Hall (Full Auditorium) - No Additional Services": 12000,
+  "Effah Hall (Ground Floor) - With Additional Services": 12000,
+  "Effah Hall (Ground Floor) - No Additional Services": 10000,
+  "Ahmed Jinapor Hall": 5000,
+  "Kwame Dattey Hall": 3500,
+  "Nikoi Kotey Hall": 2500
+};
+
+// Autofill venue cost when selecting from the "For Cost" dropdown
+document.getElementById("venueCostSelect").addEventListener("change", function () {
+  const selectedVenue = this.value;
+  const costInput = document.getElementById("venueCostInput");
+
+  if (venueCosts[selectedVenue]) {
+    costInput.value = venueCosts[selectedVenue].toFixed(2);
+  } else {
+    costInput.value = "";
+  }
+});
+
+
+
+    
 
     function populateInstitutions() {
       const instSet = new Set(entries.map(e => e["name of institution"]).filter(Boolean));
@@ -259,7 +327,6 @@
     function onInstitutionChange() {
       const inst = document.getElementById("institutionSelect").value;
       const venueSelect = document.getElementById("venueSelect");
-
       venueSelect.innerHTML = '<option value="">-- Select Venue --</option>';
 
       if (!inst) {
@@ -278,52 +345,100 @@
       venueSelect.disabled = false;
     }
 
-    function generateInvoice() {
-      const inst = document.getElementById("institutionSelect").value;
-      const venue = document.getElementById("venueSelect").value;
-      const service = document.getElementById("serviceInput").value.trim();
-      const recipientName = document.getElementById("recipientName").value.trim();
-      const recipientEmail = document.getElementById("recipientEmail").value.trim();
-      const invoiceNo = document.getElementById("invoiceId").value.trim();
-      const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
-      const siNo = document.getElementById("siNo").value.trim();
-
-      const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
-      const servicesCost = parseFloat(document.getElementById("servicesCostInput").value) || 0;
-      const totalCost = venueCost + servicesCost;
-
-      // Fill preview
-      document.getElementById("invNo").textContent = invoiceNo;
-      document.getElementById("invDate").textContent = dateVal;
-      document.getElementById("siCell").textContent = siNo;
-
-      document.getElementById("billToName").textContent = recipientName;
-      document.getElementById("billToEmail").textContent = recipientEmail;
-
-      document.getElementById("siCellRow").textContent = siNo;
-
-      let descHtml = venue;
-      if (service) {
-        descHtml += `<br>${service}`;
-      }
-      document.getElementById("descCell").innerHTML = descHtml;
-
-      document.getElementById("amountCell").textContent = venueCost.toFixed(2);
-      document.getElementById("totalCell").textContent = totalCost.toFixed(2);
-
-      document.getElementById("totalInput").value = totalCost.toFixed(2);
-
-      document.getElementById("invoice").style.display = "block";
-      document.getElementById("downloadBtn").style.display = "inline-block";
+    function generateInvoiceNo() {
+      const prefix = "GTEC-HMS";
+      const year = new Date().getFullYear().toString().slice(-2);
+      let lastNumber = localStorage.getItem("lastInvoiceNumber") || 0;
+      lastNumber = parseInt(lastNumber) + 1;
+      const invoiceNumber = String(lastNumber).padStart(3, "0");
+      localStorage.setItem("lastInvoiceNumber", lastNumber);
+      return `${prefix}-${year}-${invoiceNumber}`;
     }
 
+    
+    function generateInvoice() {
+  const venue = document.getElementById("venueSelect").value;
+  const service = document.getElementById("serviceInput").value.trim();
+  const recipientName = document.getElementById("recipientName").value.trim();
+  const recipientEmail = document.getElementById("recipientEmail").value.trim();
+  const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
+
+  const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
+
+  // ✅ Generate Invoice No.
+  const invoiceNo = generateInvoiceNo();
+  document.getElementById("invoiceId").value = invoiceNo; // left form
+  document.getElementById("invoiceNo").textContent = invoiceNo; // inside preview
+  document.getElementById("invDate").textContent = dateVal;
+
+  // Recipient
+  document.getElementById("billToName").textContent = recipientName;
+  document.getElementById("billToEmail").textContent = recipientEmail;
+
+  // Build items
+  let items = [];
+  if (venue) items.push({ desc: venue, amount: venueCost });
+  if (service === "Additional Services") {
+    items.push({ desc: service, amount: "" }); // ✅ empty instead of 0.00
+  }
+
+  // Calculate total only from numeric amounts
+  let totalCost = items.reduce((sum, item) => sum + (typeof item.amount === "number" ? item.amount : 0), 0);
+
+  // Build rows
+  let rowsHTML = "";
+  items.forEach((item, index) => {
+    rowsHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.desc}</td>
+        <td>${item.amount !== "" ? item.amount.toFixed(2) : ""}</td>
+      </tr>
+    `;
+  });
+
+  rowsHTML += `
+    <tr>
+      <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
+      <td>${totalCost.toFixed(2)}</td>
+    </tr>
+  `;
+
+  document.getElementById("itemsTable").innerHTML = `
+    <tr>
+      <th style="width:10%;">SI No.</th>
+      <th style="width:70%;">DESCRIPTION</th>
+      <th style="width:20%;">AMOUNT</th>
+    </tr>
+    ${rowsHTML}
+  `;
+
+  // ✅ Show total in left form too
+  document.getElementById("totalInput").value = totalCost.toFixed(2);
+
+  document.getElementById("invoice").style.display = "block";
+  document.getElementById("downloadBtn").style.display = "inline-block";
+}
+
+
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const invoiceElem = document.getElementById("invoice");
-      html2pdf().from(invoiceElem).save("invoice-" + new Date().getTime() + ".pdf");
-    });
+  const institution = document.getElementById("institutionSelect").value || "Institution";
+  const today = new Date();
+  const dateStr = today.getFullYear() + "-" +
+                  String(today.getMonth() + 1).padStart(2, "0") + "-" +
+                  String(today.getDate()).padStart(2, "0");
+
+  const fileName = `GTEC_Conference_Facility-${institution}-${dateStr}.pdf`.replace(/\s+/g, "_");
+
+  const invoiceElem = document.getElementById("invoice");
+  html2pdf().from(invoiceElem).save(fileName);
+});
+
   </script>
 </body>
 </html>
+
+
 
 
 
