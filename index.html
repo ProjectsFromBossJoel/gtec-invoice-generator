@@ -355,65 +355,71 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
       return `${prefix}-${year}-${invoiceNumber}`;
     }
 
+    
     function generateInvoice() {
-      const venue = document.getElementById("venueSelect").value;
-      const service = document.getElementById("serviceInput").value.trim();
-      const recipientName = document.getElementById("recipientName").value.trim();
-      const recipientEmail = document.getElementById("recipientEmail").value.trim();
-      const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
+  const venue = document.getElementById("venueSelect").value;
+  const service = document.getElementById("serviceInput").value.trim();
+  const recipientName = document.getElementById("recipientName").value.trim();
+  const recipientEmail = document.getElementById("recipientEmail").value.trim();
+  const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
 
-      const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
-      
+  const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
 
-      // Invoice No.
-      const invoiceNo = generateInvoiceNo();
-      document.getElementById("invoiceId").value = invoiceNo;
-      document.getElementById("invoiceNo").textContent = invoiceNo;
-      document.getElementById("invDate").textContent = dateVal;
+  // ✅ Generate Invoice No.
+  const invoiceNo = generateInvoiceNo();
+  document.getElementById("invoiceId").value = invoiceNo; // left form
+  document.getElementById("invoiceNo").textContent = invoiceNo; // inside preview
+  document.getElementById("invDate").textContent = dateVal;
 
-      // Recipient
-      document.getElementById("billToName").textContent = recipientName;
-      document.getElementById("billToEmail").textContent = recipientEmail;
+  // Recipient
+  document.getElementById("billToName").textContent = recipientName;
+  document.getElementById("billToEmail").textContent = recipientEmail;
 
-      // Build items
+  // Build items
   let items = [];
   if (venue) items.push({ desc: venue, amount: venueCost });
   if (service === "Additional Services") {
-    items.push({ desc: service, amount: null }); // no amount for services
+    items.push({ desc: service, amount: "" }); // ✅ empty instead of 0.00
   }
 
-      // Build rows with SI No. starting at 1 each time
-      let rowsHTML = "";
-      items.forEach((item, index) => {
-        rowsHTML += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${item.desc}</td>
-            <td>${item.amount.toFixed(2)}</td>
-          </tr>
-        `;
-      });
+  // Calculate total only from numeric amounts
+  let totalCost = items.reduce((sum, item) => sum + (typeof item.amount === "number" ? item.amount : 0), 0);
 
-      rowsHTML += `
-        <tr>
-          <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
-          <td>${venueCost.toFixed(2)}</td>
-        </tr>
-      `;
+  // Build rows
+  let rowsHTML = "";
+  items.forEach((item, index) => {
+    rowsHTML += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.desc}</td>
+        <td>${item.amount !== "" ? item.amount.toFixed(2) : ""}</td>
+      </tr>
+    `;
+  });
 
-      document.getElementById("itemsTable").innerHTML = `
-        <tr>
-          <th style="width:10%;">SI No.</th>
-          <th style="width:70%;">DESCRIPTION</th>
-          <th style="width:20%;">AMOUNT</th>
-        </tr>
-        ${rowsHTML}
-      `;
+  rowsHTML += `
+    <tr>
+      <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
+      <td>${totalCost.toFixed(2)}</td>
+    </tr>
+  `;
 
-      document.getElementById("totalInput").value = totalCost.toFixed(2);
-      document.getElementById("invoice").style.display = "block";
-      document.getElementById("downloadBtn").style.display = "inline-block";
-    }
+  document.getElementById("itemsTable").innerHTML = `
+    <tr>
+      <th style="width:10%;">SI No.</th>
+      <th style="width:70%;">DESCRIPTION</th>
+      <th style="width:20%;">AMOUNT</th>
+    </tr>
+    ${rowsHTML}
+  `;
+
+  // ✅ Show total in left form too
+  document.getElementById("totalInput").value = totalCost.toFixed(2);
+
+  document.getElementById("invoice").style.display = "block";
+  document.getElementById("downloadBtn").style.display = "inline-block";
+}
+
 
     document.getElementById("downloadBtn").addEventListener("click", () => {
   const institution = document.getElementById("institutionSelect").value || "Institution";
@@ -431,6 +437,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
