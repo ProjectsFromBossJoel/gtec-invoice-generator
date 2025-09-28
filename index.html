@@ -82,13 +82,21 @@
     <div class="form-section">
       <h2>Invoice Form</h2>
 
-      <label for="institutionSelect">Institution</label>
-      <select id="institutionSelect">
-        <option value="">-- Select Institution --</option>
-      </select>
+      <!-- Institution -->
+<label for="institutionSelect">Institution</label>
+<select id="institutionSelect">
+  <option value="">-- Select Institution --</option>
+</select>
 
-      <label for="venueSelect">Venue Booked</label>
+<!-- Venue from Google Sheet -->
+<label for="venueSelect">Venue Booked (From Institution)</label>
 <select id="venueSelect">
+  <option value="">-- Select Venue --</option>
+</select>
+
+<!-- NEW: Venue for Cost -->
+<label for="venueCostSelect">Venue Booked (For Cost)</label>
+<select id="venueCostSelect">
   <option value="">-- Select Venue --</option>
   <option value="Effah Hall (Full Auditorium) - With Additional Services">Effah Hall (Full Auditorium) - With Additional Services</option>
   <option value="Effah Hall (Full Auditorium) - No Additional Services">Effah Hall (Full Auditorium) - No Additional Services</option>
@@ -99,9 +107,9 @@
   <option value="Nikoi Kotey Hall">Nikoi Kotey Hall</option>
 </select>
 
+<!-- Venue Cost -->
 <label for="venueCostInput">Venue Cost</label>
 <input type="number" id="venueCostInput" placeholder="Auto-filled Venue Cost" readonly>
-
 
       
 
@@ -280,7 +288,7 @@
 // Map venue names to their costs
 const venueCosts = {
   "Effah Hall (Full Auditorium) - With Additional Services": 14000,
-  "Effah Hall (Full Auditorium)- No Additional Services": 12000,
+  "Effah Hall (Full Auditorium) - No Additional Services": 12000,
   "Effah Hall (Ground Floor) - With Additional Services": 12000,
   "Effah Hall (Ground Floor) - No Additional Services": 10000,
   "Ahmed Jinapor Hall": 5000,
@@ -288,7 +296,8 @@ const venueCosts = {
   "Nikoi Kotey Hall": 2500
 };
 
-document.getElementById("venueSelect").addEventListener("change", function () {
+// Autofill venue cost when selecting from the "For Cost" dropdown
+document.getElementById("venueCostSelect").addEventListener("change", function () {
   const selectedVenue = this.value;
   const costInput = document.getElementById("venueCostInput");
 
@@ -298,6 +307,7 @@ document.getElementById("venueSelect").addEventListener("change", function () {
     costInput.value = "";
   }
 });
+
 
 
     
@@ -421,6 +431,7 @@ document.getElementById("venueSelect").addEventListener("change", function () {
   </script>
 </body>
 </html>
+
 
 
 
