@@ -363,8 +363,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
       const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
 
       const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
-      const servicesCost = parseFloat(document.getElementById("servicesCostInput").value) || 0;
-      const totalCost = venueCost + servicesCost;
+      
 
       // Invoice No.
       const invoiceNo = generateInvoiceNo();
@@ -377,9 +376,11 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
       document.getElementById("billToEmail").textContent = recipientEmail;
 
       // Build items
-      let items = [];
-      if (venue) items.push({ desc: venue, amount: venueCost });
-      if (service) items.push({ desc: service, amount: servicesCost });
+  let items = [];
+  if (venue) items.push({ desc: venue, amount: venueCost });
+  if (service === "Additional Services") {
+    items.push({ desc: service, amount: null }); // no amount for services
+  }
 
       // Build rows with SI No. starting at 1 each time
       let rowsHTML = "";
@@ -396,7 +397,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
       rowsHTML += `
         <tr>
           <td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
-          <td>${totalCost.toFixed(2)}</td>
+          <td>${venueCost.toFixed(2)}</td>
         </tr>
       `;
 
@@ -430,6 +431,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
