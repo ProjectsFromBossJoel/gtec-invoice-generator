@@ -178,7 +178,7 @@
             <img src="logo1.jpg" alt="Logo" style="height:70px; display:block; margin:0 auto;" crossorigin="anonymous">
           </div>
 
-          <!-- Sender / Invoice meta -->
+          <!-- Invoice -->
           <table style="width:100%; border-collapse: collapse;">
             <tr>
               <td style="width:70%; vertical-align: top;">
@@ -197,10 +197,11 @@
 
           <!-- Recipient details -->
           <div style="margin: 20px 0;">
-            <p><strong>Bill To:</strong> <span id="billToName"></span></p>
+            <p><strong>Coordinator:</strong> <span id="billToName"></span></p>
             <p><strong>Email:</strong> <span id="billToEmail"></span></p>
           </div>
-
+<br><br>
+          
           <!-- Invoice Title -->
           <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
 
@@ -238,6 +239,8 @@
               </td>
             </tr>
           </table>
+          <br>
+          <br>
 
           <!-- Signature -->
          <div style="text-align:right; margin-top:40px;">
@@ -365,7 +368,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
 
   const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
 
-  // ✅ Generate Invoice No.
+  // Generate Invoice No.
   const invoiceNo = generateInvoiceNo();
   document.getElementById("invoiceId").value = invoiceNo; // left form
   document.getElementById("invoiceNo").textContent = invoiceNo; // inside preview
@@ -379,7 +382,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   let items = [];
   if (venue) items.push({ desc: venue, amount: venueCost });
   if (service === "Additional Services") {
-    items.push({ desc: service, amount: "" }); // ✅ empty instead of 0.00
+    items.push({ desc: service, amount: "" }); // empty instead of 0.00
   }
 
   // Calculate total only from numeric amounts
@@ -387,15 +390,18 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
 
   // Build rows
   let rowsHTML = "";
-  items.forEach((item, index) => {
+  if (venue) {
     rowsHTML += `
       <tr>
-        <td>${index + 1}</td>
-        <td>${item.desc}</td>
-        <td>${item.amount !== "" ? item.amount.toFixed(2) : ""}</td>
+        <td>1</td>
+        <td>
+          ${venue}
+          ${service === "Additional Services" ? "<br><span style='font-style:italic;'>Additional Services</span>" : ""}
+        </td>
+        <td>${venueCost.toFixed(2)}</td>
       </tr>
     `;
-  });
+  }
 
   rowsHTML += `
     <tr>
@@ -413,7 +419,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
     ${rowsHTML}
   `;
 
-  // ✅ Show total in left form too
+  // Show total in left form too 
   document.getElementById("totalInput").value = totalCost.toFixed(2);
 
   document.getElementById("invoice").style.display = "block";
@@ -437,6 +443,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
