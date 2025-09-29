@@ -121,10 +121,12 @@
 
       
       <label for="recipientName">Invoice Recipient Name</label>
-      <input type="text" id="recipientName" placeholder="Recipient Name">
+<input list="recipientNameList" id="recipientName" placeholder="Recipient Name">
+<datalist id="recipientNameList"></datalist>
 
       <label for="recipientEmail">Invoice Recipient Email</label>
-      <input type="email" id="recipientEmail" placeholder="Recipient Email">
+<input list="recipientEmailList" id="recipientEmail" placeholder="Recipient Email">
+<datalist id="recipientEmailList"></datalist>
 
       <label for="invoiceId">Invoice No.</label>
       <input type="text" id="invoiceId" readonly>
@@ -258,6 +260,9 @@
   </div>
   <button id="downloadBtn">Download PDF</button>
 
+
+  
+
   <script>
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=201909864&single=true&output=csv";
     let entries = [];
@@ -285,7 +290,61 @@
         alert("Unable to load data from sheet.");
       }
     });
+    
+    populateInstitutions();
+populateRecipients();  // 👈 this is new
 
+
+
+    function populateRecipients() {
+  // Get all unique names & emails from your sheet entries
+  const nameSet = new Set(entries.map(e => e["recipient name"]).filter(Boolean));
+  const emailSet = new Set(entries.map(e => e["recipient email"]).filter(Boolean));
+
+  // Get the datalist elements from your HTML
+  const nameList = document.getElementById("recipientNameList");
+  const emailList = document.getElementById("recipientEmailList");
+
+  // Clear them first (in case they already have options)
+  nameList.innerHTML = "";
+  emailList.innerHTML = "";
+
+  // Add each unique name as <option> in recipientNameList
+  nameSet.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    nameList.appendChild(opt);
+  });
+
+  // Add each unique email as <option> in recipientEmailList
+  emailSet.forEach(email => {
+    const opt = document.createElement("option");
+    opt.value = email;
+    emailList.appendChild(opt);
+  });
+}
+
+
+
+// Auto-link recipient name and email
+document.getElementById("recipientName").addEventListener("input", function () {
+  const name = this.value;
+  const match = entries.find(e => e["recipient name"] === name);
+  if (match) {
+    document.getElementById("recipientEmail").value = match["recipient email"] || "";
+  }
+});
+
+document.getElementById("recipientEmail").addEventListener("input", function () {
+  const email = this.value;
+  const match = entries.find(e => e["recipient email"] === email);
+  if (match) {
+    document.getElementById("recipientName").value = match["recipient name"] || "";
+  }
+});
+
+    
+    
 
 // Map venue names to their costs
 const venueCosts = {
@@ -327,26 +386,37 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
       instSelect.onchange = onInstitutionChange;
     }
 
+    
     function onInstitutionChange() {
-      const inst = document.getElementById("institutionSelect").value;
-      const venueSelect = document.getElementById("venueSelect");
-      venueSelect.innerHTML = '<option value="">-- Select Venue --</option>';
+  const inst = document.getElementById("institutionSelect").value;
+  const venueSelect = document.getElementById("venueSelect");
+  venueSelect.innerHTML = '<option value="">-- Select Venue --</option>';
 
-      if (!inst) {
-        venueSelect.disabled = true;
-        return;
-      }
+  if (!inst) {
+    venueSelect.disabled = true;
+    return;
+  }
 
-      const filtered = entries.filter(e => e["name of institution"] === inst);
-      filtered.forEach(e => {
-        const vOpt = document.createElement("option");
-        vOpt.value = e["venue booked"];
-        vOpt.textContent = e["venue booked"];
-        venueSelect.appendChild(vOpt);
-      });
+  const filtered = entries.filter(e => e["name of institution"] === inst);
 
-      venueSelect.disabled = false;
-    }
+  // ✅ Autofill recipient when institution is chosen
+  if (filtered.length > 0) {
+    document.getElementById("recipientName").value = filtered[0]["recipient name"] || "";
+    document.getElementById("recipientEmail").value = filtered[0]["recipient email"] || "";
+  }
+
+  // ✅ Populate venue list
+  filtered.forEach(e => {
+    const vOpt = document.createElement("option");
+    vOpt.value = e["venue booked"];
+    vOpt.textContent = e["venue booked"];
+    venueSelect.appendChild(vOpt);
+  });
+
+  venueSelect.disabled = false;
+}
+
+    
 
     function generateInvoiceNo() {
       const prefix = "GTEC-HMS";
