@@ -147,10 +147,7 @@
       <div id="invoice" class="invoice">
         <div class="invoice-content">
 
-          <!-- Watermark Logo -->
-          <div id="watermark">
-            <img src="logo1.jpg" alt="Logo">
-          </div>
+          
 
           <style>
             #invoice {
@@ -178,7 +175,7 @@
 
           <!-- Header -->
           <div class="invoice-header" style="text-align:center; margin:6px 0 12px 0;">
-            <img src="logo1.jpg" alt="Logo" style="height:70px; display:block; margin:0 auto;" crossorigin="anonymous">
+            
           </div>
 
           <!-- Invoice -->
@@ -191,6 +188,7 @@
                 <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
                 <p><b>Date:</b> <span id="invDate"></span></p>
               </td>
+              
               <td style="width:30%; border:1px solid #000; padding:5px;">
                 <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
                 <p><b>Date:</b> <span id="invDate"></span></p>
@@ -203,7 +201,7 @@
             <p><strong>:</strong> <span id="billToName"></span></p>
             <p><strong>Email:</strong> <span id="billToEmail"></span></p>
           </div>
-<br><br>
+<br><br><br>
           
           <!-- Invoice Title -->
           <h2 style="text-align:center; margin:10px 0;">INVOICE</h2>
@@ -221,7 +219,20 @@
           <!-- Footer -->
           <table style="width:100%; margin-top:20px; border-collapse: collapse;">
             <tr>
-              <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
+              
+              
+              <td style="width:45%; border:1px solid #000; padding:0;">
+                <table style="width:100%; border-collapse: collapse;" border="1">
+                  <tr><td>A/c Holder’s Name</td><td><b>GTEC CONFERENCE</b></td></tr>
+                  <tr><td>Bank Name</td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
+                  <tr><td>A/c No.</td><td><b>0701010009158801</b></td></tr>
+                  <tr><td>Branch & Bank Code</td><td><b>Gulf House</b></td></tr>
+                  <tr><td>SWIFT CODE</td><td>________________</td></tr>
+                </table>
+              </td>
+
+                <br>
+                <td style="width:55%; border:1px solid #000; padding:8px; vertical-align:top;">
                 <p><i><b>KINDLY NOTE:</b></i></p>
                 <ol style="margin:0; padding-left:15px;">
                   <b><i>
@@ -231,22 +242,14 @@
                   </i></b>
                 </ol>
               </td>
-              <td style="width:45%; border:1px solid #000; padding:0;">
-                <table style="width:100%; border-collapse: collapse;" border="1">
-                  <tr><td><b>A/c Holder’s Name</b></td><td><b>GTEC CONFERENCE</b></td></tr>
-                  <tr><td><b>Bank Name</b></td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
-                  <tr><td><b>A/c No.</b></td><td><b>0701010009158801</b></td></tr>
-                  <tr><td><b>Branch & Bank Code</b></td><td><b>Gulf House</b></td></tr>
-                  <tr><td><b>SWIFT CODE</b></td><td>________________</td></tr>
-                </table>
-              </td>
+              
             </tr>
           </table>
           <br>
           <br>
 
           <!-- Signature -->
-         <div style="text-align:right; margin-top:40px;">
+         <div style="text-align:left; margin-top:40px;">
   <p>Signature: ________________________</p>
   <p style="margin-top:3px; font-size:12px; font-weight:bold;">
     AG. HEAD, HOSPITALITY MANAGEMENT SERVICES
@@ -514,6 +517,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
