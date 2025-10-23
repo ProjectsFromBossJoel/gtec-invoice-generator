@@ -80,7 +80,7 @@
   <div class="container">
     <!-- LEFT: FORM -->
     <div class="form-section">
-      <img src="logo1.jpg" alt="GTEC Logo" class="logo" style="height:50px; width:auto;">
+      
       <h2>Invoice Form</h2>
 
       <!-- Institution -->
@@ -185,11 +185,11 @@
           <table style="width:100%; border-collapse: collapse;">
             <tr>
               <td style="width:70%; vertical-align: top;">
-                <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
-                <p>P.O.BOX MB 28</p>
-                <p>MINISTRIES – ACCRA</p>
+                <p>GTEC HOSPITALITY MANAGEMENT SERVICES</p>
                 <p>Contact: 0244202959, 0244660848</p>
                 <p>Email: hospitality@gtec.edu.gh</p>
+                <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
+                <p><b>Date:</b> <span id="invDate"></span></p>
               </td>
               <td style="width:30%; border:1px solid #000; padding:5px;">
                 <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
@@ -200,7 +200,7 @@
 
           <!-- Recipient details -->
           <div style="margin: 20px 0;">
-            <p><strong>Coordinator:</strong> <span id="billToName"></span></p>
+            <p><strong>:</strong> <span id="billToName"></span></p>
             <p><strong>Email:</strong> <span id="billToEmail"></span></p>
           </div>
 <br><br>
@@ -514,6 +514,7 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   </script>
 </body>
 </html>
+
 
 
 
