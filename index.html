@@ -189,6 +189,20 @@
 }
 
 
+    #invoiceNo {
+  border: none;
+  border-bottom: 1px solid #000;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  font-weight: bold;
+  width: 160px;
+}
+#invoiceNo:focus {
+  border-bottom: 1px solid #1e90ff;
+}
+
+
   </style>
   
 </head>
@@ -310,7 +324,11 @@
   <p><b>Contact:</b> 0244202959, 0244660848</p>
   <p><b>Email:</b> hospitality@gtec.edu.gh</p>
   <br>
-  <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
+                  
+  <p><strong>Invoice No.:</strong> 
+  <input type="text" id="invoiceNo" style="width:150px; border:none; border-bottom:1px solid #000; font-weight:bold;" />
+</p>
+
   <p><b>Date:</b> <span id="invDate"></span></p>
     </div>
 
@@ -558,13 +576,14 @@
       const recipientName = document.getElementById("recipientName").value.trim();
       const invoiceLocation = document.getElementById("invoiceLocation").value;
       const recipientEmail = document.getElementById("recipientEmail").value.trim();
+      const invoiceNo = document.getElementById("invoiceNo").value.trim();
       const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
       const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
 
       // Generate Invoice No.
       const invoiceNo = generateInvoiceNo();
       document.getElementById("invoiceId").value = invoiceNo; // left form
-      document.getElementById("invoiceNo").textContent = invoiceNo; // inside preview
+      document.getElementById("invoiceNo").value = invoiceNo; // inside preview
       document.getElementById("invDate").textContent = dateVal;
 
       // Recipient
@@ -758,6 +777,7 @@ document.getElementById("signatureName").addEventListener("input", function() {
   </script>
 </body>
 </html>
+
 
 
 
