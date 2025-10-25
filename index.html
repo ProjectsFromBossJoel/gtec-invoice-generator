@@ -237,6 +237,12 @@
       <input list="recipientNameList" id="recipientName" placeholder="Recipient Name">
       <datalist id="recipientNameList"></datalist>
 
+      <div class="form-group">
+  <label for="invoiceLocation">Location:</label>
+  <textarea id="invoiceLocation" rows="1" placeholder="Enter location"></textarea>
+</div>
+
+
       <label for="recipientEmail">Invoice Recipient Email</label>
       <input list="recipientEmailList" id="recipientEmail" placeholder="Recipient Email">
       <datalist id="recipientEmailList"></datalist>
@@ -315,6 +321,7 @@
           <!-- Recipient details -->
           <div style="margin: 20px 0;">
             <p><strong></strong> <span id="billToName"></span></p>
+            <p><b></b> <span id="billToLocation"></span></p>
             <p><strong>Email:</strong> <span id="billToEmail"></span></p>
           </div>
 
@@ -335,13 +342,13 @@
           <br>
           
           <!-- Footer -->
-          <ol style="font-size:16px;">
+          <id style="font-size:16px;">
                   <p>Bank Name : <b>AGRICULTURAL DEVELOPMENT BANK</b></p>
                   <p>A/c Holder’s Name : <b>GTEC CONFERENCE</b></p>
                   <p>A/c No.: <b>0701010009158801</b></p>
                   <p>Branch & Bank Code : <b>Gulf House</b></p>
                   <p>SWIFT CODE : </p>
-          </ol>
+          </id>
                
               <br>
               <p>
@@ -549,6 +556,7 @@
       const venue = document.getElementById("venueSelect").value;
       const service = document.getElementById("serviceInput").value.trim();
       const recipientName = document.getElementById("recipientName").value.trim();
+      const invoiceLocation = document.getElementById("invoiceLocation").value;
       const recipientEmail = document.getElementById("recipientEmail").value.trim();
       const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
       const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
@@ -561,6 +569,7 @@
 
       // Recipient
       document.getElementById("billToName").textContent = recipientName;
+      document.getElementById("billToLocation").textContent = invoiceLocation || "";
       document.getElementById("billToEmail").textContent = recipientEmail;
 
       // Build items
@@ -621,6 +630,7 @@ document.getElementById("signatureDisplay").textContent = signatureText;
         institution: document.getElementById("institutionSelect").value || "N/A",
         venue: venue,
         recipient: recipientName,
+        location: invoiceLocation,
         total: totalCost.toFixed(2),
         date: dateVal,
         signature: signatureText
@@ -714,6 +724,7 @@ function viewInvoiceFromHistory(invNumber) {
   document.getElementById("invoiceNo").textContent = invoice.number;
   document.getElementById("invDate").textContent = invoice.date;
   document.getElementById("billToName").textContent = invoice.recipient;
+  document.getElementById("billToLocation").textContent = invoice.location || "";
   document.getElementById("billToEmail").textContent = ""; // optional if stored later
   document.getElementById("signatureDisplay").textContent = invoice.signature || "";
 
@@ -747,6 +758,7 @@ document.getElementById("signatureName").addEventListener("input", function() {
   </script>
 </body>
 </html>
+
 
 
 
