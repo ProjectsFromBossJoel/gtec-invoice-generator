@@ -142,6 +142,24 @@
       <button onclick="generateInvoice()">Generate Invoice</button>
     </div>
 
+
+    <h2 style="margin-top:30px;">Invoice History</h2>
+<table id="invoiceHistoryTable" border="1" style="width:100%; border-collapse:collapse; margin-top:10px;">
+  <thead>
+    <tr>
+      <th>Invoice No.</th>
+      <th>Institution</th>
+      <th>Venue</th>
+      <th>Recipient</th>
+      <th>Total (GHS)</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+    
+
     <!-- RIGHT: PREVIEW -->
     <div class="preview-section">
       <div id="invoice" class="invoice">
@@ -495,6 +513,18 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
 
   document.getElementById("invoice").style.display = "block";
   document.getElementById("downloadBtn").style.display = "inline-block";
+
+      // Save invoice to history
+saveInvoiceToHistory({
+  number: invoiceNo,
+  institution: document.getElementById("institutionSelect").value || "N/A",
+  venue: venue,
+  recipient: recipientName,
+  total: totalCost.toFixed(2),
+  date: dateVal
+});
+
+      
 }
 
 
@@ -511,9 +541,44 @@ document.getElementById("venueCostSelect").addEventListener("change", function (
   html2pdf().from(invoiceElem).save(fileName);
 });
 
+
+
+    // Save invoice record to localStorage
+function saveInvoiceToHistory(invoice) {
+  const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
+  history.push(invoice);
+  localStorage.setItem("invoiceHistory", JSON.stringify(history));
+  loadInvoiceHistory(); // Refresh table after saving
+}
+
+// Load and display stored invoices
+function loadInvoiceHistory() {
+  const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
+  const tbody = document.querySelector("#invoiceHistoryTable tbody");
+  tbody.innerHTML = "";
+
+  history.forEach(inv => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${inv.number}</td>
+      <td>${inv.institution}</td>
+      <td>${inv.venue}</td>
+      <td>${inv.recipient}</td>
+      <td>${inv.total}</td>
+      <td>${inv.date}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Load history when page opens
+document.addEventListener("DOMContentLoaded", loadInvoiceHistory);
+
+    
   </script>
 </body>
 </html>
+
 
 
 
