@@ -179,7 +179,18 @@
 .modal .download-btn-sm:hover { background:#1e7e34; }
 
 
+    .invoice-header-info {
+  font-size: 13px;        /* smaller than default (usually 16px) */
+  line-height: 1.4;       /* keeps it readable */
+  margin-bottom: 10px;    /* small spacing before next section */
+}
+.invoice-header-info p {
+  margin: 2px 0;          /* reduce spacing between lines */
+}
+
+
   </style>
+  
 </head>
 <body>
   <div class="container">
@@ -283,10 +294,13 @@
             <tr>
               <td style="width:70%; vertical-align: top;">
                 <p><b>GTEC HOSPITALITY MANAGEMENT SERVICES</b></p>
-                <p><b>Contact:</b> 0244202959, 0244660848</p>
-                <p><b>Email:</b> hospitality@gtec.edu.gh</p>
-                <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
-                <p><b>Date:</b> <span id="invDate"></span></p>
+                <div class="invoice-header-info">
+  <p><b>Contact:</b> 0244202959, 0244660848</p>
+  <p><b>Email:</b> hospitality@gtec.edu.gh</p>
+  <p><strong>Invoice No.:</strong> <span id="invoiceNo"></span></p>
+  <p><b>Date:</b> <span id="invDate"></span></p>
+    </div>
+
               </td>
             </tr>
           </table>
@@ -317,11 +331,11 @@
             <tr>
               <td style="width:45%; border:1px solid #000; padding:0;">
                 <table style="width:100%; border-collapse: collapse;" border="1">
-                  <tr><td>A/c Holder’s Name</td><td><b>GTEC CONFERENCE</b></td></tr>
-                  <tr><td>Bank Name</td><td><b>AGRICULTURAL DEVELOPMENT BANK</b></td></tr>
-                  <tr><td>A/c No.</td><td><b>0701010009158801</b></td></tr>
-                  <tr><td>Branch & Bank Code</td><td><b>Gulf House</b></td></tr>
-                  <tr><td>SWIFT CODE</td><td>________________</td></tr>
+                  <p>A/c Holder’s Name : <b>GTEC CONFERENCE</b></p>
+                  <p>Bank Name : <b>AGRICULTURAL DEVELOPMENT BANK</b></p>
+                  <p>A/c No. : <b>0701010009158801</b></p>
+                  <p>Branch & Bank Code : <b>Gulf House</b></p>
+                  <p>SWIFT CODE : ________________</p>
                 </table>
               </td>
 
@@ -712,4 +726,5 @@ function downloadInvoiceFromHistory(invNumber) {
   </script>
 </body>
 </html>
+
 
