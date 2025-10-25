@@ -165,6 +165,20 @@
       .modal-content { padding: 12px; }
     }
 
+    .modal td button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.modal .view-btn-sm { background:#17a2b8; color:#fff; margin-right:4px; }
+.modal .view-btn-sm:hover { background:#117a8b; }
+.modal .download-btn-sm { background:#28a745; color:#fff; }
+.modal .download-btn-sm:hover { background:#1e7e34; }
+
+
   </style>
 </head>
 <body>
@@ -295,6 +309,9 @@
             </tr>
           </table>
 
+          <br>
+          <br>
+          <br>
           <!-- Footer -->
           <table style="width:100%; margin-top:20px; border-collapse: collapse;">
             <tr>
@@ -337,39 +354,44 @@
   </div>
 
   <!-- Modal: Invoice History -->
-  <div id="historyModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Generated Invoices</h3>
-        <div>
-          <button id="clearHistoryBtn" title="Clear history" style="margin-right:10px;padding:8px 12px;background:#dc3545;color:#fff;border:none;border-radius:6px;cursor:pointer;">Clear</button>
-          <button class="close" id="closeModalBtn" aria-label="Close">&times;</button>
-        </div>
-      </div>
-
-      <div class="modal-body">
-        <div style="width:100%; overflow-x:auto;">
-          <table id="modalInvoiceTable">
-            <thead>
-              <tr>
-                <th>Invoice No.</th>
-                <th>Institution</th>
-                <th>Venue</th>
-                <th>Recipient</th>
-                <th>Total (GHS)</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="margin-top:12px; text-align:right;">
-        <button onclick="closeHistoryModal()" style="background:#6c757d;padding:8px 14px;border-radius:6px;color:#fff;border:none;cursor:pointer;">Close</button>
+<div id="historyModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Generated Invoices</h3>
+      <div>
+        <button id="clearHistoryBtn" title="Clear history"
+                style="margin-right:10px;padding:8px 12px;background:#dc3545;
+                       color:#fff;border:none;border-radius:6px;cursor:pointer;">
+          Clear
+        </button>
+        <button class="close" id="closeModalBtn" aria-label="Close">&times;</button>
       </div>
     </div>
+
+    <div class="modal-body" style="overflow-x:auto;">
+      <table id="modalInvoiceTable">
+        <thead>
+          <tr>
+            <th>Invoice No.</th>
+            <th>Date</th>
+            <th>Total (GHS)</th>
+            <th>Client</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:12px; text-align:right;">
+      <button onclick="closeHistoryModal()"
+              style="background:#6c757d;padding:8px 14px;border-radius:6px;
+                     color:#fff;border:none;cursor:pointer;">Close</button>
+    </div>
   </div>
+</div>
+
 
   <script>
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR9htPtAQjzUItZtpzGxl71AVEqki52Kj6hqbxcenA1wEwQt0wuH5yB6gkv0Mx_UQki_MLnS5ZBRuey/pub?gid=201909864&single=true&output=csv";
@@ -597,59 +619,97 @@
       localStorage.setItem("invoiceHistory", JSON.stringify(history));
     }
 
-    // Modal functions
-    function openHistoryModal() {
-      populateModalInvoiceHistory();
-      const modal = document.getElementById("historyModal");
-      modal.style.display = "block";
-      modal.setAttribute("aria-hidden", "false");
-    }
 
-    function closeHistoryModal() {
-      const modal = document.getElementById("historyModal");
-      modal.style.display = "none";
-      modal.setAttribute("aria-hidden", "true");
-    }
+    
+    // --- Open / Close modal ---
+function openHistoryModal() {
+  populateModalInvoiceHistory();
+  const modal = document.getElementById("historyModal");
+  modal.style.display = "block";
+  modal.setAttribute("aria-hidden", "false");
+}
+function closeHistoryModal() {
+  const modal = document.getElementById("historyModal");
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+}
+document.getElementById("closeModalBtn").addEventListener("click", closeHistoryModal);
+document.getElementById("historyModal").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeHistoryModal();
+});
 
-    document.getElementById("closeModalBtn").addEventListener("click", closeHistoryModal);
-    document.getElementById("historyModal").addEventListener("click", function(e) {
-      if (e.target === this) closeHistoryModal(); // close when clicking outside modal content
-    });
+// --- Populate table with localStorage invoices ---
+function populateModalInvoiceHistory() {
+  const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
+  const tbody = document.querySelector("#modalInvoiceTable tbody");
+  tbody.innerHTML = "";
 
-    // Populate the modal's table with stored invoices
-    function populateModalInvoiceHistory() {
-      const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
-      const tbody = document.querySelector("#modalInvoiceTable tbody");
-      tbody.innerHTML = "";
+  if (history.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:18px;">
+      No invoices found</td></tr>`;
+    return;
+  }
 
-      if (history.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="6" style="text-align:center; padding:18px;">No invoices found</td>`;
-        tbody.appendChild(tr);
-        return;
-      }
+  history.slice().reverse().forEach((inv, idx) => {
+    const row = document.createElement("tr");
+    const status = "Completed"; // static, can extend later
+    row.innerHTML = `
+      <td>${inv.number}</td>
+      <td>${inv.date}</td>
+      <td>${inv.total}</td>
+      <td>${inv.recipient}</td>
+      <td>${status}</td>
+      <td>
+        <button class="view-btn-sm" onclick="viewInvoiceFromHistory('${inv.number}')">View</button>
+        <button class="download-btn-sm" onclick="downloadInvoiceFromHistory('${inv.number}')">Download</button>
+      </td>`;
+    tbody.appendChild(row);
+  });
+}
 
-      history.slice().reverse().forEach(inv => { // show latest first
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${inv.number}</td>
-          <td>${inv.institution}</td>
-          <td>${inv.venue}</td>
-          <td>${inv.recipient}</td>
-          <td>${inv.total}</td>
-          <td>${inv.date}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
+// --- Clear history ---
+document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+  if (!confirm("Clear all saved invoice history? This cannot be undone.")) return;
+  localStorage.removeItem("invoiceHistory");
+  populateModalInvoiceHistory();
+});
 
-    // Clear history button
-    document.getElementById("clearHistoryBtn").addEventListener("click", function() {
-      if (!confirm("Clear all saved invoice history? This cannot be undone.")) return;
-      localStorage.removeItem("invoiceHistory");
-      populateModalInvoiceHistory();
-    });
+// --- Reopen a saved invoice preview ---
+function viewInvoiceFromHistory(invNumber) {
+  const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
+  const invoice = history.find(h => h.number === invNumber);
+  if (!invoice) return alert("Invoice not found.");
+  closeHistoryModal();
+
+  // Restore basic data to preview area
+  document.getElementById("invoice").style.display = "block";
+  document.getElementById("downloadBtn").style.display = "inline-block";
+  document.getElementById("invoiceNo").textContent = invoice.number;
+  document.getElementById("invDate").textContent = invoice.date;
+  document.getElementById("billToName").textContent = invoice.recipient;
+  document.getElementById("billToEmail").textContent = ""; // optional if stored later
+  document.getElementById("itemsTable").innerHTML = `
+    <tr><th>SI No.</th><th>DESCRIPTION</th><th>AMOUNT</th></tr>
+    <tr><td>1</td><td>${invoice.venue}</td><td>${invoice.total}</td></tr>
+    <tr><td colspan="2" style="text-align:right;"><b>TOTAL</b></td>
+        <td><b>${invoice.total}</b></td></tr>`;
+}
+
+// --- Direct download from modal ---
+function downloadInvoiceFromHistory(invNumber) {
+  const history = JSON.parse(localStorage.getItem("invoiceHistory")) || [];
+  const invoice = history.find(h => h.number === invNumber);
+  if (!invoice) return alert("Invoice not found.");
+
+  // Temporarily render invoice into hidden preview for export
+  viewInvoiceFromHistory(invNumber);
+  const invoiceElem = document.getElementById("invoice");
+  const fileName = `GTEC_Invoice_${invoice.number}.pdf`;
+  html2pdf().from(invoiceElem).save(fileName);
+}
+
 
   </script>
 </body>
 </html>
+
