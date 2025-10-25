@@ -247,6 +247,12 @@
       <label for="dated">Date</label>
       <input type="date" id="dated">
 
+      <div class="form-group">
+  <label for="signatureName">Signature Name:</label>
+  <textarea id="signatureName" rows="1" placeholder="Enter name of signatory"></textarea>
+</div>
+
+
       <label for="totalInput">Total</label>
       <input type="number" id="totalInput" placeholder="Total" readonly>
 
@@ -329,11 +335,11 @@
           <br>
           
           <!-- Footer -->
-                  <p>A/c Holder’s Name  : <b>GTEC CONFERENCE</b></p>
                   <p>Bank Name          : <b>AGRICULTURAL DEVELOPMENT BANK</b></p>
+                  <p>A/c Holder’s Name  : <b>GTEC CONFERENCE</b></p>
                   <p>A/c No.            : <b>0701010009158801</b></p>
                   <p>Branch & Bank Code : <b>Gulf House</b></p>
-                  <p>SWIFT CODE         : ________________</p>
+                  <p>SWIFT CODE         : </p>
                
               <br><br>
               <p>
@@ -347,6 +353,13 @@
                   </i></b>
                 </ol>
         </p>
+
+
+          <div class="signature-section">
+  <p><strong>Authorized by:</strong></p>
+  <div class="signature-line"></div>
+  <p id="signatureDisplay" style="margin-top:5px; font-weight:bold;"></p>
+</div>
 
           <!-- Signature -->
           <div style="text-align:left; margin-top:40px;">
@@ -599,6 +612,11 @@
       document.getElementById("invoice").style.display = "block";
       document.getElementById("downloadBtn").style.display = "inline-block";
 
+  const signatureText = document.getElementById("signatureName").value.trim();
+document.getElementById("signatureDisplay").textContent = signatureText;
+
+
+      
       // Save invoice to history
       saveInvoiceToHistory({
         number: invoiceNo,
@@ -606,7 +624,8 @@
         venue: venue,
         recipient: recipientName,
         total: totalCost.toFixed(2),
-        date: dateVal
+        date: dateVal,
+        signature: signatureText
       });
     }
 
@@ -698,6 +717,8 @@ function viewInvoiceFromHistory(invNumber) {
   document.getElementById("invDate").textContent = invoice.date;
   document.getElementById("billToName").textContent = invoice.recipient;
   document.getElementById("billToEmail").textContent = ""; // optional if stored later
+  document.getElementById("signatureDisplay").textContent = invoice.signature || "";
+
   document.getElementById("itemsTable").innerHTML = `
     <tr><th>SI No.</th><th>DESCRIPTION</th><th>AMOUNT</th></tr>
     <tr><td>1</td><td>${invoice.venue}</td><td>${invoice.total}</td></tr>
@@ -719,9 +740,16 @@ function downloadInvoiceFromHistory(invNumber) {
 }
 
 
+    // --- Signature sync (live update + save) ---
+document.getElementById("signatureName").addEventListener("input", function() {
+  document.getElementById("signatureDisplay").textContent = this.value;
+});
+
+
   </script>
 </body>
 </html>
+
 
 
 
