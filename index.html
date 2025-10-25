@@ -74,6 +74,32 @@
     #downloadBtn:hover {
       background: #1e7e34;
     }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Important: keeps column widths fixed */
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+/* Optional: set specific widths for readability */
+th:nth-child(1), td:nth-child(1) { width: 15%; }  /* Invoice No. */
+th:nth-child(2), td:nth-child(2) { width: 25%; }  /* Institution */
+th:nth-child(3), td:nth-child(3) { width: 20%; }  /* Venue */
+th:nth-child(4), td:nth-child(4) { width: 10%; }  /* Recipient */
+th:nth-child(5), td:nth-child(5) { width: 10%; }  /* Total */
+th:nth-child(6), td:nth-child(6) { width: 20%; }  /* Date */
+
+    
   </style>
 </head>
 <body>
@@ -578,6 +604,7 @@ document.addEventListener("DOMContentLoaded", loadInvoiceHistory);
   </script>
 </body>
 </html>
+
 
 
 
