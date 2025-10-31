@@ -189,15 +189,13 @@
 
     /* Style for the preview invoice number input */
     #invoiceNo {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 14px;
-  font-weight: bold;
-  width: 160px;
-}
-
-   
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      font-weight: bold;
+      width: 160px;
+    }
 
     /* Make invoiceId (form field) visually similar but editable */
     #invoiceId {
@@ -314,10 +312,10 @@
                   <p><b>Contact:</b> 0244202959, 0244660848</p>
                   <p><b>Email:</b> hospitality@gtec.edu.gh</p>
                   <br>
-                  
+
                   <p><strong>Invoice No.:</strong>
-  <input type="text" id="invoiceNo" style="width:150px; border:none; background:transparent; outline:none; font-weight:bold;" />
-</p>
+                    <input type="text" id="invoiceNo" style="width:150px; border:none; background:transparent; outline:none; font-weight:bold;" />
+                  </p>
 
                   <p><b>Date:</b> <span id="invDate"></span></p>
                 </div>
@@ -436,7 +434,7 @@
       const year = new Date().getFullYear().toString().slice(-2);
       let lastNumber = parseInt(localStorage.getItem("lastInvoiceNumber") || "0", 10);
       lastNumber = lastNumber + 1;
-      localStorage.setItem("lastInvoiceNumber", lastNumber);
+      localStorage.setItem("lastInvoiceNumber", String(lastNumber));
       const invoiceNumber = String(lastNumber).padStart(3, "0");
       return `${prefix}-${year}-${invoiceNumber}`;
     }
@@ -470,15 +468,18 @@
       // Set suggested invoice number in the form (editable) but don't reserve it yet.
       const suggested = peekNextInvoiceNo();
       document.getElementById("invoiceId").value = suggested;
-      // Keep preview invoiceNo empty until user generates invoice
+      // Show suggestion also in preview input so user sees it — still editable
       document.getElementById("invoiceNo").value = suggested;
     });
 
     function populateRecipients() {
-      const nameSet = new Set(entries.map(e => e["recipient name"]).filter(Boolean));
-      const emailSet = new Set(entries.map(e => e["recipient email"]).filter(Boolean));
+      // defensive: ensure datalists exist
       const nameList = document.getElementById("recipientNameList");
       const emailList = document.getElementById("recipientEmailList");
+      if (!nameList || !emailList) return;
+
+      const nameSet = new Set(entries.map(e => e["recipient name"]).filter(Boolean));
+      const emailSet = new Set(entries.map(e => e["recipient email"]).filter(Boolean));
       nameList.innerHTML = "";
       emailList.innerHTML = "";
       nameSet.forEach(name => {
@@ -493,6 +494,7 @@
       });
     }
 
+    // keep recipient name/email auto-linking
     document.getElementById("recipientName").addEventListener("input", function () {
       const name = this.value;
       const match = entries.find(e => e["recipient name"] === name);
@@ -509,21 +511,22 @@
       }
     });
 
+    // Fixed venueCosts - numbers must be numeric (no commas)
     const venueCosts = {
-      "Effah Hall (Full Auditorium) - With Additional Services": 14,000,
-      "Effah Hall (Full Auditorium) - No Additional Services": 12,000,
-      "Effah Hall (Ground Floor) - With Additional Services": 12,000,
-      "Effah Hall (Ground Floor) - No Additional Services": 10,000,
-      "Ahmed Jinapor Hall": 5,000,
-      "Kwame Dattey Hall": 3,500,
-      "Nikoi Kotey Hall": 2,500
+      "Effah Hall (Full Auditorium) - With Additional Services": 14000,
+      "Effah Hall (Full Auditorium) - No Additional Services": 12000,
+      "Effah Hall (Ground Floor) - With Additional Services": 12000,
+      "Effah Hall (Ground Floor) - No Additional Services": 10000,
+      "Ahmed Jinapor Hall": 5000,
+      "Kwame Dattey Hall": 3500,
+      "Nikoi Kotey Hall": 2500
     };
 
     document.getElementById("venueCostSelect").addEventListener("change", function () {
       const selectedVenue = this.value;
       const costInput = document.getElementById("venueCostInput");
-      if (venueCosts[selectedVenue]) {
-        costInput.value = venueCosts[selectedVenue].toFixed(2);
+      if (venueCosts[selectedVenue] !== undefined) {
+        costInput.value = Number(venueCosts[selectedVenue]).toFixed(2);
       } else {
         costInput.value = "";
       }
@@ -532,6 +535,7 @@
     function populateInstitutions() {
       const instSet = new Set(entries.map(e => e["name of institution"]).filter(Boolean));
       const instSelect = document.getElementById("institutionSelect");
+      if (!instSelect) return;
       instSelect.innerHTML = '<option value="">-- Select Institution --</option>';
       instSet.forEach(inst => {
         const opt = document.createElement("option");
@@ -574,7 +578,7 @@
       const dateVal = document.getElementById("dated").value || new Date().toLocaleDateString();
       const venueCost = parseFloat(document.getElementById("venueCostInput").value) || 0;
 
-      // If user left invoiceId empty, or it matches the peek suggestion, reserve the number.
+      // If user left invoiceId empty, or it equals the peek suggestion, reserve the next numbered invoice.
       const suggested = peekNextInvoiceNo();
       if (!chosenInvoiceNo || chosenInvoiceNo === suggested) {
         // This will increment and reserve the next number
@@ -656,6 +660,7 @@
       });
     }
 
+    // attach download handler (button exists in DOM)
     document.getElementById("downloadBtn").addEventListener("click", () => {
       const institution = document.getElementById("institutionSelect").value || "Institution";
       const today = new Date();
@@ -776,9 +781,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
