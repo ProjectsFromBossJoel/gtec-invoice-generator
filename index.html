@@ -660,18 +660,53 @@
       });
     }
 
+    
     // attach download handler (button exists in DOM)
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-      const institution = document.getElementById("institutionSelect").value || "Institution";
-      const today = new Date();
-      const dateStr = today.getFullYear() + "-" +
-                      String(today.getMonth() + 1).padStart(2, "0") + "-" +
-                      String(today.getDate()).padStart(2, "0");
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const institution = document.getElementById("institutionSelect").value || "Institution";
+  const invoiceNo = document.getElementById("invoiceNo").value || "INV";
+  const today = new Date();
+  const dateStr = today.getFullYear() + "-" +
+                  String(today.getMonth() + 1).padStart(2, "0") + "-" +
+                  String(today.getDate()).padStart(2, "0");
 
-      const fileName = `GTEC_Conference_Facility-${institution}-${dateStr}.pdf`.replace(/\s+/g, "_");
-      const invoiceElem = document.getElementById("invoice");
+  const fileName = `GTEC_Invoice_${invoiceNo}_${institution}_${dateStr}.pdf`
+                    .replace(/\s+/g, "_");
+
+  const invoiceElem = document.getElementById("invoice");
+
+  // 1️⃣ Generate PDF as base64
+  html2pdf()
+    .from(invoiceElem)
+    .outputPdf("datauristring")
+    .then(pdfDataUri => {
+      const base64 = pdfDataUri.split(",")[1];
+
+      // 2️⃣ Download to user's device (same as before)
       html2pdf().from(invoiceElem).save(fileName);
+
+      // 3️⃣ Upload to Google Drive (background)
+      fetch("https://script.google.com/macros/s/AKfycbwxrXu1F4dJwfYbDllvkpMuk0wn1uk8I1qwek3g5X63KYKDUDXtDzXj5x0HYJSh85c/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pdf: base64,
+          fileName: fileName,
+          invoiceNo: invoiceNo,
+          institution: institution
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Saved to Drive ✔", data.fileId);
+      })
+      .catch(err => {
+        console.error("Drive upload failed ❌", err);
+      });
     });
+});
+
+    
 
     // Save invoice record to localStorage
     function saveInvoiceToHistory(invoice) {
@@ -781,4 +816,5 @@
   </script>
 </body>
 </html>
+
 
