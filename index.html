@@ -686,7 +686,7 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
       html2pdf().from(invoiceElem).save(fileName);
 
       // 3️⃣ Upload to Google Drive (background)
-      fetch("https://script.google.com/macros/s/AKfycbzSLV3ake2jzB-2nhmVNcxASFOqtkynNm_lWwqVJdp7wQlNU7Lc19iVRbAV_lgqis0/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbxcJLWeemy7PRYliGDHeSYa7BCIlOUsVzuAHFCvQIKQ8U_R2QkxneVQqNV6b_EgFj5k/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -820,6 +820,7 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
