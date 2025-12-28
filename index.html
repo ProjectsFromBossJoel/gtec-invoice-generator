@@ -687,26 +687,22 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
 
       // 3️⃣ Upload to Google Drive (background)
       fetch("https://script.google.com/macros/s/AKfycbxcJLWeemy7PRYliGDHeSYa7BCIlOUsVzuAHFCvQIKQ8U_R2QkxneVQqNV6b_EgFj5k/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pdf: base64,
-          fileName: fileName,
-          invoiceNo: invoiceNo,
-          institution: institution
-        })
-      })
-      .then(res => res.json())
-.then(data => {
-  if (!data.success) {
-    throw new Error(data.error);
-  }
-  console.log("Saved to Drive ✔", data.fileId, data.name);
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify({
+    pdf: base64,
+    fileName: fileName,
+    invoiceNo: invoiceNo,
+    institution: institution
+  })
 })
+.then(() => {
+  console.log("Drive upload sent ✔");
+})
+.catch(err => {
+  console.error("Drive upload failed ❌", err);
+});
 
-      .catch(err => {
-        console.error("Drive upload failed ❌", err);
-      });
     });
 });
 
@@ -820,6 +816,7 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
