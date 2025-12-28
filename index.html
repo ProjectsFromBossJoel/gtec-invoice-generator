@@ -686,7 +686,7 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
       html2pdf().from(invoiceElem).save(fileName);
 
       // 3️⃣ Upload to Google Drive (background)
-      fetch("https://script.google.com/macros/s/AKfycbwxrXu1F4dJwfYbDllvkpMuk0wn1uk8I1qwek3g5X63KYKDUDXtDzXj5x0HYJSh85c/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbzSLV3ake2jzB-2nhmVNcxASFOqtkynNm_lWwqVJdp7wQlNU7Lc19iVRbAV_lgqis0/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -697,9 +697,13 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
         })
       })
       .then(res => res.json())
-      .then(data => {
-        console.log("Saved to Drive ✔", data.fileId);
-      })
+.then(data => {
+  if (!data.success) {
+    throw new Error(data.error);
+  }
+  console.log("Saved to Drive ✔", data.fileId, data.name);
+})
+
       .catch(err => {
         console.error("Drive upload failed ❌", err);
       });
@@ -816,5 +820,6 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
